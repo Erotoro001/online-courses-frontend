@@ -33,9 +33,7 @@ function App() {
 
   const fetchLessons = async () => {
     try {
-      const response = await axios.get(`${API_URL}/lessons`, {
-        headers: { Authorization: localStorage.getItem('token') },
-      });
+      const response = await axios.get(`${API_URL}/lessons`);
       setLessons(response.data);
     } catch (error) {
       alert('Помилка завантаження уроків');
@@ -43,17 +41,21 @@ function App() {
   };
 
   const handleTest = async (lessonId) => {
-    const userAnswer = prompt('2 + 2 = ?');
-    const isCorrect = userAnswer === '4';
+    const questions = {
+      1: { question: '2 + 2 = ?', answer: '4' },
+      2: { question: 'Столиця України?', answer: 'Київ' },
+      3: { question: '3 * 3 = ?', answer: '9' },
+      4: { question: 'Найвища гора світу?', answer: 'Еверест' },
+    };
+    const { question, answer } = questions[lessonId] || questions[1];
+    const userAnswer = prompt(question);
+    const isCorrect = userAnswer?.toLowerCase() === answer.toLowerCase();
     try {
-      await axios.post(
-        `${API_URL}/results`,
-        { lessonId, score: isCorrect ? 1 : 0 },
-        { headers: { Authorization: localStorage.getItem('token') } }
-      );
+      await axios.post(`${API_URL}/results`, { lessonId, score: isCorrect ? 1 : 0 }); // Прибрали заголовок
       setScore(isCorrect ? 'Правильно!' : 'Неправильно');
     } catch (error) {
       alert('Помилка збереження результату');
+      console.error(error); // Додай логування помилки
     }
   };
 
