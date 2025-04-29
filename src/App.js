@@ -8,9 +8,12 @@ function App() {
   const [lessons, setLessons] = useState([]);
   const [score, setScore] = useState(null);
 
+  // Використовуємо змінну середовища для URL бекенду
+  const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
+
   const handleRegister = async () => {
     try {
-      await axios.post('http://localhost:3001/register', { email, password });
+      await axios.post(`${API_URL}/register`, { email, password });
       alert('Реєстрація успішна');
     } catch (error) {
       alert('Помилка реєстрації');
@@ -19,7 +22,7 @@ function App() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/login', { email, password });
+      const response = await axios.post(`${API_URL}/login`, { email, password });
       setToken(response.data.token);
       localStorage.setItem('token', response.data.token);
       alert('Вхід успішний');
@@ -30,7 +33,7 @@ function App() {
 
   const fetchLessons = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/lessons', {
+      const response = await axios.get(`${API_URL}/lessons`, {
         headers: { Authorization: localStorage.getItem('token') },
       });
       setLessons(response.data);
@@ -44,7 +47,7 @@ function App() {
     const isCorrect = userAnswer === '4';
     try {
       await axios.post(
-        'http://localhost:3001/results',
+        `${API_URL}/results`,
         { lessonId, score: isCorrect ? 1 : 0 },
         { headers: { Authorization: localStorage.getItem('token') } }
       );
