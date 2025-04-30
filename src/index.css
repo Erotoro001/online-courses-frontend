@@ -24,6 +24,7 @@ body.light {
   --modalBg: #ffffff; /* Білий фон для модального вікна */
   --modalText: #1f2937; /* Темний текст у модальному вікні */
   --modalQuestionText: #111827; /* Ще темніший текст для питань */
+  --tableHoverBg: #e0e7ff; /* Світло-синій фон для ховеру таблиці у світлій темі */
 }
 
 body.dark {
@@ -41,6 +42,7 @@ body.dark {
   --modalBg: #2d3748; /* Темний фон для модального вікна */
   --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
   --modalQuestionText: #f9fafb; /* Білий текст для питань */
+  --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
 }
 
 body {
@@ -165,7 +167,7 @@ thead tr {
 }
 
 tbody tr:hover {
-  background-color: var(--secondary);
+  background-color: var(--tableHoverBg);
 }
 
 /* Стилі для модального вікна */
