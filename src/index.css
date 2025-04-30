@@ -146,6 +146,10 @@ body.dark button.button-gray:hover {
 /* Ефект для зображень */
 .lesson-image, .main-page-image {
   transition: transform 0.3s ease;
+  user-select: none; /* Заборона виділення зображень */
+  -webkit-user-drag: none; /* Заборона перетягування у WebKit-браузерах */
+  -moz-user-select: none; /* Заборона виділення у Firefox */
+  -ms-user-select: none; /* Заборона виділення у Edge */
 }
 
 .lesson-image:hover, .main-page-image:hover {

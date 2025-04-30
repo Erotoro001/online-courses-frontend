@@ -239,6 +239,12 @@ function App() {
     setExpandedLesson(expandedLesson === lessonId ? null : lessonId);
   };
 
+  // Функція для відключення контекстного меню та перетягування
+  const handleImageProtection = (e) => {
+    e.preventDefault();
+    return false;
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center p-6">
       {!token && !isAuthScreen ? (
@@ -264,6 +270,8 @@ function App() {
               className="main-page-image w-full max-w-md mx-auto mb-6 rounded-lg shadow-md"
               onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found')}
               loading="lazy"
+              onContextMenu={handleImageProtection}
+              onDragStart={handleImageProtection}
             />
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-transparent bg-clip-text">
               GeoLearn
@@ -278,8 +286,19 @@ function App() {
               Дізнатися більше
             </button>
           </main>
-          <footer className="mt-auto text-textSecondary text-sm">
-            Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К
+          <footer className="mt-auto text-textSecondary text-sm text-center">
+            <p>Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К</p>
+            <p>
+              © 2025 Гопка Максим Сергійович. Усі права захищені. Ліцензія:{' '}
+              <a
+                href="https://github.com/erotoro001/online-courses-frontend/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-primary"
+              >
+                MIT License
+              </a>
+            </p>
           </footer>
         </div>
       ) : !token && isAuthScreen ? (
@@ -316,7 +335,7 @@ function App() {
           </div>
         </div>
       ) : (
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl flex flex-col min-h-screen">
           <div className="flex justify-between items-center mb-6">
             <h1 className="header-title text-3xl font-bold">Уроки</h1>
             <div className="flex space-x-4">
@@ -376,6 +395,8 @@ function App() {
                       className="lesson-image w-full h-40 object-cover rounded-lg mb-4"
                       onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found')}
                       loading="lazy"
+                      onContextMenu={handleImageProtection}
+                      onDragStart={handleImageProtection}
                     />
                     <div className="flex items-center space-x-2">
                       {lesson.id === 1 && <FaGlobe className="text-primary" />}
@@ -459,6 +480,21 @@ function App() {
               <p className="text-textSecondary">Ви ще не проходили тести.</p>
             )}
           </div>
+
+          <footer className="mt-auto text-textSecondary text-sm text-center pt-6">
+            <p>Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К</p>
+            <p>
+              © 2025 Гопка Максим Сергійович. Усі права захищені. Ліцензія:{' '}
+              <a
+                href="https://github.com/erotoro001/online-courses-frontend/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-primary"
+              >
+                MIT License
+              </a>
+            </p>
+          </footer>
         </div>
       )}
 
