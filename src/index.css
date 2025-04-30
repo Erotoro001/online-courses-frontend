@@ -2,7 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary: #4f46e5; /* Індиго для кнопок і акцентів */
+  --secondary: #e0e7ff; /* Світло-синій для ховерів */
+  --textPrimary: #1f2937; /* Темно-сірий для тексту */
+  --textSecondary: #6b7280; /* Світло-сірий для другорядного тексту */
+  --background: #f9fafb; /* Світлий фон */
+  --cardBackground: #ffffff; /* Білий фон для карток */
+  --error: #ef4444; /* Червоний для помилок */
+  --success: #10b981; /* Зелений для успішних повідомлень */
+}
+
+body.light {
+  --background: #f9fafb;
+  --cardBackground: #ffffff;
+  --textPrimary: #1f2937;
+  --textSecondary: #6b7280;
+}
+
+body.dark {
+  --background: #1f2937;
+  --cardBackground: #374151;
+  --textPrimary: #f9fafb;
+  --textSecondary: #9ca3af;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: #F9FAFB;
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+  color: var(--textPrimary);
+}
+
+/* Стилі для кнопок */
+button {
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+/* Стилі для карток уроків */
+.lesson-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lesson-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Ефект для зображень */
+.lesson-image, .main-page-image {
+  transition: transform 0.3s ease;
+}
+
+.lesson-image:hover, .main-page-image:hover {
+  transform: scale(1.05);
+}
+
+/* Стилі для таблиці результатів */
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+thead tr {
+  background-color: var(--secondary);
+}
+
+tbody tr:hover {
+  background-color: var(--secondary);
+}
+
+/* Стилі для модального вікна */
+.modal {
+  backdrop-filter: blur(5px);
+}
+
+/* Стилі для інпутів */
+input {
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: var(--primary);
 }
