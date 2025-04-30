@@ -11,7 +11,6 @@ function App() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
 
-  // Перевіряємо токен при завантаженні сторінки
   useEffect(() => {
     if (token) {
       fetchLessons();
@@ -50,14 +49,25 @@ function App() {
   };
 
   const fetchLessons = async () => {
+    if (!token) {
+      alert('Токен відсутній. Увійдіть заново.');
+      handleLogout();
+      return;
+    }
+    console.log('Authorization header:', `Bearer ${token}`);
     try {
       const response = await axios.get(`${API_URL}/lessons`, {
-        headers: { Authorization: token },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setLessons(response.data);
     } catch (error) {
       console.error('Помилка завантаження уроків:', error.response?.data || error.message);
-      alert('Помилка завантаження уроків: ' + (error.response?.data?.error || error.message));
+      if (error.response?.status === 401) {
+        alert('Сесія закінчилася. Увійдіть заново.');
+        handleLogout();
+      } else {
+        alert('Помилка завантаження уроків: ' + (error.response?.data?.error || error.message));
+      }
     }
   };
 
@@ -70,18 +80,23 @@ function App() {
     };
     const { question, answer } = questions[lessonId] || questions[1];
     const userAnswer = prompt(question);
-    if (!userAnswer) return; // Якщо користувач скасував prompt
+    if (!userAnswer) return;
     const isCorrect = userAnswer.toLowerCase() === answer.toLowerCase();
     try {
       await axios.post(
         `${API_URL}/results`,
         { lessonId, score: isCorrect ? 1 : 0 },
-        { headers: { Authorization: token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setScore(isCorrect ? 'Правильно!' : 'Неправильно');
     } catch (error) {
       console.error('Помилка збереження результату:', error.response?.data || error.message);
-      alert('Помилка збереження результату: ' + (error.response?.data?.error || error.message));
+      if (error.response?.status === 401) {
+        alert('Сесія закінчилася. Увійдіть заново.');
+        handleLogout();
+      } else {
+        alert('Помилка збереження результату: ' + (error.response?.data?.error || error.message));
+      }
     }
   };
 
