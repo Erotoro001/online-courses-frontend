@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { FiLogOut } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
   const [email, setEmail] = useState('');
@@ -7,35 +9,66 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [lessons, setLessons] = useState([]);
   const [results, setResults] = useState([]);
-  const [score, setScore] = useState(null);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentLessonId, setCurrentLessonId] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [testScore, setTestScore] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [isAuthScreen, setIsAuthScreen] = useState(false);
+  const [expandedLesson, setExpandedLesson] = useState(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
 
-  // Питання для тестів (по 3 питання на урок)
+  // Дані уроків із теоретичним матеріалом
+  const lessonData = {
+    1: {
+      title: 'Урок 1 | Вступ до географії',
+      theory: 'Географія — це наука, яка вивчає просторові закономірності розміщення природних, соціальних та економічних явищ на Землі. Вона поділяється на фізичну географію (вивчення природних об’єктів, таких як гори, річки, клімат) і соціально-економічну географію (дослідження людської діяльності, наприклад, населення, економіки, культури). У цьому вступному уроці ми розглянемо основні поняття, методи та історію розвитку географії як науки.',
+    },
+    2: {
+      title: 'Урок 2 | Клімат і погода',
+      theory: 'Клімат — це багаторічний режим погоди, характерний для певної місцевості. Погода може змінюватися щодня, тоді як клімат є більш стабільним. Основні елементи клімату: температура, опади, вологість, атмосферний тиск. У цьому уроці ми дізнаємося, як формуються кліматичні зони, які фактори впливають на клімат (наприклад, широта, висота над рівнем моря, океанічні течії), і як клімат впливає на життя людей.',
+    },
+    3: {
+      title: 'Урок 3 | Гідросфера',
+      theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на клімат і ландшафти.',
+    },
+    4: {
+      title: 'Урок 4 | Населення світу',
+      theory: 'Населення світу налічує понад 8 мільярдів людей (станом на 2025 рік). У цьому уроці ми розглянемо демографічні процеси: народжуваність, смертність, міграцію. Також вивчимо, як населення розподілене по континентах, які регіони є найбільш густонаселеними (наприклад, Південно-Східна Азія), і які фактори впливають на зростання населення (економіка, культура, освіта).',
+    },
+  };
+
+  // Питання для тестів (5 питань, 4 варіанти, 1 правильна відповідь)
   const questions = {
     1: [
-      { question: '2 + 2 = ?', options: ['3', '4', '5'], answer: '4' },
-      { question: '5 - 3 = ?', options: ['1', '2', '3'], answer: '2' },
-      { question: '10 / 2 = ?', options: ['4', '5', '6'], answer: '5' },
+      { question: 'Що вивчає географія?', options: ['Просторові закономірності', 'Хімічні реакції', 'Історію мистецтва', 'Математичні рівняння'], answer: 'Просторові закономірності' },
+      { question: 'На які основні розділи поділяється географія?', options: ['Фізична і соціально-економічна', 'Теоретична і прикладна', 'Математична і хімічна', 'Історична і літературна'], answer: 'Фізична і соціально-економічна' },
+      { question: 'Що є об’єктом вивчення фізичної географії?', options: ['Природні об’єкти', 'Економіка', 'Культура', 'Політика'], answer: 'Природні об’єкти' },
+      { question: 'Що вивчає соціально-економічна географія?', options: ['Людську діяльність', 'Гірські породи', 'Клімат', 'Зірки'], answer: 'Людську діяльність' },
+      { question: 'Який метод часто використовується в географії?', options: ['Картографічний', 'Хімічний аналіз', 'Математичне моделювання', 'Літературний аналіз'], answer: 'Картографічний' },
     ],
     2: [
-      { question: 'Столиця України?', options: ['Львів', 'Київ', 'Одеса'], answer: 'Київ' },
-      { question: 'Найдовша річка України?', options: ['Дніпро', 'Дунай', 'Десна'], answer: 'Дніпро' },
-      { question: 'Найвища гора України?', options: ['Говерла', 'Піп Іван', 'Брескул'], answer: 'Говерла' },
+      { question: 'Що таке клімат?', options: ['Багаторічний режим погоди', 'Щоденні зміни погоди', 'Температура повітря', 'Кількість опадів'], answer: 'Багаторічний режим погоди' },
+      { question: 'Який фактор найбільше впливає на клімат?', options: ['Широта', 'Населення', 'Економіка', 'Культура'], answer: 'Широта' },
+      { question: 'Що є елементом клімату?', options: ['Температура', 'Рівень освіти', 'Кількість доріг', 'Тип ґрунту'], answer: 'Температура' },
+      { question: 'Як океанічні течії впливають на клімат?', options: ['Змінюють температуру', 'Не впливають', 'Збільшують населення', 'Зменшують вологість'], answer: 'Змінюють температуру' },
+      { question: 'Яка кліматична зона найтепліша?', options: ['Тропічна', 'Полярна', 'Помірна', 'Субтропічна'], answer: 'Тропічна' },
     ],
     3: [
-      { question: '3 * 3 = ?', options: ['6', '9', '12'], answer: '9' },
-      { question: '8 / 4 = ?', options: ['2', '3', '4'], answer: '2' },
-      { question: '7 - 2 = ?', options: ['4', '5', '6'], answer: '5' },
+      { question: 'Що входить до гідросфери?', options: ['Океани і річки', 'Гірські породи', 'Атмосферні гази', 'Рослини'], answer: 'Океани і річки' },
+      { question: 'Яку частину поверхні Землі займає Світовий океан?', options: ['71%', '50%', '30%', '90%'], answer: '71%' },
+      { question: 'Що таке кругообіг води?', options: ['Цикл руху води в природі', 'Рух повітря', 'Зміна температури', 'Ріст рослин'], answer: 'Цикл руху води в природі' },
+      { question: 'Що впливає на солоність океанів?', options: ['Випаровування', 'Температура повітря', 'Кількість риб', 'Рівень освіти'], answer: 'Випаровування' },
+      { question: 'Як гідросфера впливає на клімат?', options: ['Регулює температуру', 'Збільшує населення', 'Зменшує вологість', 'Не впливає'], answer: 'Регулює температуру' },
     ],
     4: [
-      { question: 'Найвища гора світу?', options: ['Еверест', 'К2', 'Кіліманджаро'], answer: 'Еверест' },
-      { question: 'Найбільший океан?', options: ['Атлантичний', 'Індійський', 'Тихий'], answer: 'Тихий' },
-      { question: 'Найдовша річка світу?', options: ['Амазонка', 'Ніл', 'Янцзи'], answer: 'Амазонка' },
+      { question: 'Скільки людей проживає у світі (2025)?', options: ['Понад 8 мільярдів', '5 мільярдів', '10 мільярдів', '3 мільярди'], answer: 'Понад 8 мільярдів' },
+      { question: 'Що вивчає демографія?', options: ['Народжуваність і смертність', 'Гірські породи', 'Клімат', 'Рослини'], answer: 'Народжуваність і смертність' },
+      { question: 'Який регіон є найбільш густонаселеним?', options: ['Південно-Східна Азія', 'Європа', 'Антарктида', 'Австралія'], answer: 'Південно-Східна Азія' },
+      { question: 'Що впливає на зростання населення?', options: ['Економіка', 'Клімат', 'Гірські породи', 'Зірки'], answer: 'Економіка' },
+      { question: 'Який континент має найбільше населення?', options: ['Азія', 'Африка', 'Європа', 'Австралія'], answer: 'Азія' },
     ],
   };
 
@@ -45,7 +78,7 @@ function App() {
       alert('Реєстрація успішна');
     } catch (error) {
       console.error('Помилка реєстрації:', error.response?.data || error.message);
-      alert('Помилка реєстрації: ' + (error.response?.data?.error || error.message));
+      setError('Помилка реєстрації: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -55,10 +88,12 @@ function App() {
       const newToken = response.data.token;
       setToken(newToken);
       localStorage.setItem('token', newToken);
+      setError(null);
+      setIsAuthScreen(false);
       alert('Вхід успішний');
     } catch (error) {
       console.error('Помилка входу:', error.response?.data || error.message);
-      alert('Помилка входу: ' + (error.response?.data?.error || error.message));
+      setError('Помилка входу: ' + (error.response?.data?.error || error.message));
     }
   };
 
@@ -67,29 +102,34 @@ function App() {
     localStorage.removeItem('token');
     setLessons([]);
     setResults([]);
-    setScore(null);
+    setError(null);
+    setIsAuthScreen(false);
     alert('Ви вийшли з облікового запису');
   }, []);
 
   const fetchLessons = useCallback(async () => {
     if (!token) {
-      alert('Токен відсутній. Увійдіть заново.');
+      setError('Токен відсутній. Увійдіть заново.');
       handleLogout();
       return;
     }
+    setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/lessons`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLessons(response.data);
+      setError(null);
     } catch (error) {
       console.error('Помилка завантаження уроків:', error.response?.data || error.message);
       if (error.response?.status === 401) {
-        alert('Сесія закінчилася. Увійдіть заново.');
+        setError('Сесія закінчилася. Увійдіть заново.');
         handleLogout();
       } else {
-        alert('Помилка завантаження уроків: ' + (error.response?.data?.error || error.message));
+        setError('Помилка завантаження уроків: ' + (error.response?.data?.error || error.message));
       }
+    } finally {
+      setLoading(false);
     }
   }, [token, handleLogout, API_URL]);
 
@@ -99,13 +139,14 @@ function App() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setResults(response.data);
+      setError(null);
     } catch (error) {
       console.error('Помилка завантаження результатів:', error.response?.data || error.message);
       if (error.response?.status === 401) {
-        alert('Сесія закінчилася. Увійдіть заново.');
+        setError('Сесія закінчилася. Увійдіть заново.');
         handleLogout();
       } else {
-        alert('Помилка завантаження результатів: ' + (error.response?.data?.error || error.message));
+        setError('Помилка завантаження результатів: ' + (error.response?.data?.error || error.message));
       }
     }
   }, [token, handleLogout, API_URL]);
@@ -149,24 +190,49 @@ function App() {
         { lessonId: currentLessonId, score: scorePercentage },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setScore(`Ви набрали ${finalScore} із ${totalQuestions} (${scorePercentage.toFixed(2)}%)`);
-      fetchResults(); // Оновлюємо результати після тесту
+      fetchResults();
+      setError(null);
     } catch (error) {
       console.error('Помилка збереження результату:', error.response?.data || error.message);
       if (error.response?.status === 401) {
-        alert('Сесія закінчилася. Увійдіть заново.');
+        setError('Сесія закінчилася. Увійдіть заново.');
         handleLogout();
       } else {
-        alert('Помилка збереження результату: ' + (error.response?.data?.error || error.message));
+        setError('Помилка збереження результату: ' + (error.response?.data?.error || error.message));
       }
     }
   };
 
+  const toggleLesson = (lessonId) => {
+    setExpandedLesson(expandedLesson === lessonId ? null : lessonId);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center p-6">
-      {!token ? (
+      {!token && !isAuthScreen ? (
+        <div className="w-full max-w-4xl flex flex-col items-center">
+          <header className="w-full flex justify-end mb-6">
+            <button
+              onClick={() => setIsAuthScreen(true)}
+              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+            >
+              Логін/Реєстрація
+            </button>
+          </header>
+          <main className="text-center flex-1">
+            <h1 className="text-4xl font-bold text-textPrimary mb-4">GeoLearn</h1>
+            <p className="text-lg text-gray-600 mb-8">
+              Веб-застосунок GeoLearn створений для зручного вивчення географії через інтерактивні уроки та тести. Ви можете ознайомитися з теоретичним матеріалом, пройти тести та відстежувати свої результати. Зареєструйтеся, щоб розпочати навчання!
+            </p>
+          </main>
+          <footer className="mt-auto text-gray-500 text-sm">
+            Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К
+          </footer>
+        </div>
+      ) : !token && isAuthScreen ? (
         <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-textPrimary mb-6 text-center">Реєстрація / Вхід</h1>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
           <input
             type="email"
             value={email}
@@ -202,37 +268,47 @@ function App() {
             <h1 className="text-3xl font-bold text-textPrimary">Уроки</h1>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+              className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
             >
-              Вийти
+              <FiLogOut /> <span>Вийти</span>
             </button>
           </div>
 
-          {/* Секція уроків */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {lessons.map((lesson) => (
-              <div
-                key={lesson.id}
-                className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
-              >
-                <h2 className="text-xl font-semibold text-textPrimary mb-2">{lesson.title}</h2>
-                <p className="text-gray-600 mb-4">
-                  Пройдіть тест, щоб перевірити свої знання з цього уроку.
-                </p>
-                <button
-                  onClick={() => startTest(lesson.id)}
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
-                >
-                  Пройти тест
-                </button>
-              </div>
-            ))}
-          </div>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
 
-          {/* Секція результатів */}
+          {loading ? (
+            <p className="text-gray-600">Завантаження...</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              {lessons.map((lesson) => (
+                <div
+                  key={lesson.id}
+                  className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                >
+                  <h2
+                    className="text-xl font-semibold text-textPrimary mb-2 cursor-pointer"
+                    onClick={() => toggleLesson(lesson.id)}
+                  >
+                    {lessonData[lesson.id]?.title || lesson.title}
+                  </h2>
+                  {expandedLesson === lesson.id && (
+                    <div className="mb-4">
+                      <p className="text-gray-600 mb-4">{lessonData[lesson.id]?.theory}</p>
+                      <button
+                        onClick={() => startTest(lesson.id)}
+                        className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                      >
+                        Пройти тест
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-2xl font-semibold text-textPrimary mb-4">Ваші результати</h2>
-            {score && <p className="text-green-600 mb-4">{score}</p>}
             {results.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
@@ -240,16 +316,22 @@ function App() {
                     <tr className="border-b">
                       <th className="p-3 text-textPrimary">Урок</th>
                       <th className="p-3 text-textPrimary">Оцінка (%)</th>
-                      <th className="p-3 text-textPrimary">Дата</th>
+                      <th className="p-3 text-textPrimary">Дата та час</th>
                     </tr>
                   </thead>
                   <tbody>
                     {results.map((result, index) => (
                       <tr key={index} className="border-b">
-                        <td className="p-3">Урок {result.lessonId}</td>
+                        <td className="p-3">{lessonData[result.lessonId]?.title || `Урок ${result.lessonId}`}</td>
                         <td className="p-3">{result.score.toFixed(2)}%</td>
                         <td className="p-3">
-                          {new Date(result.createdAt).toLocaleDateString('uk-UA')}
+                          {new Date(result.createdAt).toLocaleString('uk-UA', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </td>
                       </tr>
                     ))}
@@ -263,33 +345,44 @@ function App() {
         </div>
       )}
 
-      {/* Модальне вікно для тесту */}
-      {isModalOpen && currentLessonId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold text-textPrimary mb-4">
-              Тест для Уроку {currentLessonId}
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Питання {currentQuestionIndex + 1} із {questions[currentLessonId].length}
-            </p>
-            <p className="text-lg font-medium mb-4">
-              {questions[currentLessonId][currentQuestionIndex].question}
-            </p>
-            <div className="space-y-2">
-              {questions[currentLessonId][currentQuestionIndex].options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleAnswer(option)}
-                  className="w-full text-left p-3 border rounded-lg hover:bg-secondary transition"
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isModalOpen && currentLessonId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg p-6 w-full max-w-md"
+            >
+              <h2 className="text-xl font-semibold text-textPrimary mb-4">
+                Тест для {lessonData[currentLessonId]?.title || `Урок ${currentLessonId}`}
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Питання {currentQuestionIndex + 1} із {questions[currentLessonId].length}
+              </p>
+              <p className="text-lg font-medium mb-4">
+                {questions[currentLessonId][currentQuestionIndex].question}
+              </p>
+              <div className="space-y-2">
+                {questions[currentLessonId][currentQuestionIndex].options.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleAnswer(option)}
+                    className="w-full text-left p-3 border rounded-lg hover:bg-secondary transition"
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
