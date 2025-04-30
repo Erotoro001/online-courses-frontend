@@ -5,10 +5,6 @@
 :root {
   --primary: #4f46e5; /* Індиго для кнопок і акцентів */
   --secondary: #e0e7ff; /* Світло-синій для ховерів */
-  --textPrimary: #1f2937; /* Темно-сірий для тексту */
-  --textSecondary: #6b7280; /* Світло-сірий для другорядного тексту */
-  --background: #f9fafb; /* Світлий фон */
-  --cardBackground: #ffffff; /* Білий фон для карток */
   --error: #ef4444; /* Червоний для помилок */
   --success: #10b981; /* Зелений для успішних повідомлень */
 }
@@ -18,6 +14,10 @@ body.light {
   --cardBackground: #ffffff;
   --textPrimary: #1f2937;
   --textSecondary: #6b7280;
+  --buttonBg: #e5e7eb; /* Сірий фон для кнопок у світлій темі */
+  --buttonText: #1f2937; /* Темний текст для кнопок */
+  --borderColor: #d1d5db; /* Світло-сірий для меж */
+  --inputBg: #ffffff; /* Фон для інпутів */
 }
 
 body.dark {
@@ -25,6 +25,10 @@ body.dark {
   --cardBackground: #374151;
   --textPrimary: #f9fafb;
   --textSecondary: #9ca3af;
+  --buttonBg: #4b5563; /* Темно-сірий фон для кнопок у темній темі */
+  --buttonText: #f9fafb; /* Світлий текст для кнопок */
+  --borderColor: #4b5563; /* Темно-сірий для меж */
+  --inputBg: #4b5563; /* Темний фон для інпутів */
 }
 
 body {
@@ -44,8 +48,41 @@ button:hover {
   transform: translateY(-2px);
 }
 
+button.bg-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+button.bg-primary:hover {
+  background-color: #4338ca;
+}
+
+button.bg-error {
+  background-color: var(--error);
+  color: #ffffff;
+}
+
+button.bg-error:hover {
+  background-color: #dc2626;
+}
+
+/* Стилі для кнопок із сірим фоном (наприклад, "Дізнатися більше", "Темна/Світла тема") */
+button.button-gray {
+  background-color: var(--buttonBg);
+  color: var(--buttonText);
+}
+
+button.button-gray:hover {
+  background-color: #d1d5db; /* Світліший сірий для ховеру у світлій темі */
+}
+
+body.dark button.button-gray:hover {
+  background-color: #6b7280; /* Темніший сірий для ховеру у темній темі */
+}
+
 /* Стилі для карток уроків */
 .lesson-card {
+  background-color: var(--cardBackground);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -88,9 +125,34 @@ tbody tr:hover {
 
 /* Стилі для інпутів */
 input {
+  background-color: var(--inputBg);
+  color: var(--textPrimary);
+  border-color: var(--borderColor);
   transition: all 0.3s ease;
 }
 
 input:focus {
   border-color: var(--primary);
+}
+
+/* Стилі для іконок */
+svg.text-primary {
+  color: var(--primary);
+}
+
+svg.text-success {
+  color: var(--success);
+}
+
+svg.text-error {
+  color: var(--error);
+}
+
+/* Стилі для тексту */
+.text-error {
+  color: var(--error);
+}
+
+.text-success {
+  color: var(--success);
 }

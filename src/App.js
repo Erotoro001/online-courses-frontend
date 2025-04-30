@@ -246,7 +246,7 @@ function App() {
           <header className="w-full flex justify-between items-center mb-6">
             <button
               onClick={toggleTheme}
-              className="bg-gray-200 text-textPrimary px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
             >
               {theme === 'light' ? 'Темна тема' : 'Світла тема'}
             </button>
@@ -273,7 +273,7 @@ function App() {
             </p>
             <button
               onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-              className="mb-4 bg-gray-200 text-textPrimary px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              className="mb-4 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
             >
               Дізнатися більше
             </button>
@@ -291,14 +291,14 @@ function App() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-cardBackground text-textPrimary"
+            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Пароль"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-cardBackground text-textPrimary"
+            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <div className="flex space-x-4">
             <button
@@ -309,7 +309,7 @@ function App() {
             </button>
             <button
               onClick={handleLogin}
-              className="flex-1 bg-primary text-white p supermen-3 rounded-lg hover:bg-indigo-700 transition"
+              className="flex-1 bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition"
             >
               Увійти
             </button>
@@ -322,7 +322,7 @@ function App() {
             <div className="flex space-x-4">
               <button
                 onClick={toggleTheme}
-                className="bg-gray-200 text-textPrimary px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
@@ -368,7 +368,7 @@ function App() {
                 return (
                   <div
                     key={lesson.id}
-                    className="lesson-card bg-cardBackground rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                    className="lesson-card rounded-lg shadow-md p-6 hover:shadow-lg transition"
                   >
                     <img
                       src={lessonData[lesson.id]?.image}
