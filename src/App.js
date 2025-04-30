@@ -26,13 +26,13 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isAuthScreen, setIsAuthScreen] = useState(false);
   const [isProfileScreen, setIsProfileScreen] = useState(false);
-  const [isMainScreen, setIsMainScreen] = useState(true); // Новий стан для головного екрану
+  const [isMainScreen, setIsMainScreen] = useState(true);
   const [expandedLesson, setExpandedLesson] = useState(null);
   const [theme, setTheme] = useState('light');
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
+  console.log('API_URL:', API_URL); // Додаємо логування API_URL
 
-  // Дані уроків із теоретичним матеріалом і зображеннями
   const lessonData = {
     1: {
       title: 'Вступ | Вступ до географії',
@@ -56,10 +56,8 @@ function App() {
     },
   };
 
-  // Зображення для головної сторінки
   const mainPageImageSrc = mainPageImage;
 
-  // Питання для тестів (5 питань, 4 варіанти, 1 правильна відповідь)
   const questions = {
     1: [
       { question: 'Що вивчає географія?', options: ['Просторові закономірності', 'Хімічні реакції', 'Історію мистецтва', 'Математичні рівняння'], answer: 'Просторові закономірності' },
@@ -100,8 +98,10 @@ function App() {
   }, [theme]);
 
   const handleRegister = async () => {
+    console.log('Trying to register with:', { email, password });
     try {
-      await axios.post(`${API_URL}/register`, { email, password });
+      const response = await axios.post(`${API_URL}/register`, { email, password });
+      console.log('Register response:', response.data);
       alert('Реєстрація успішна');
     } catch (error) {
       console.error('Помилка реєстрації:', error.response?.data || error.message);
@@ -110,14 +110,16 @@ function App() {
   };
 
   const handleLogin = async () => {
+    console.log('Trying to login with:', { email, password });
     try {
       const response = await axios.post(`${API_URL}/login`, { email, password });
+      console.log('Login response:', response.data);
       const newToken = response.data.token;
       setToken(newToken);
       localStorage.setItem('token', newToken);
       setError(null);
       setIsAuthScreen(false);
-      setIsMainScreen(false); // Після входу переходимо до курсів
+      setIsMainScreen(false);
       alert('Вхід успішний');
     } catch (error) {
       console.error('Помилка входу:', error.response?.data || error.message);
@@ -133,14 +135,14 @@ function App() {
     setError(null);
     setIsAuthScreen(false);
     setIsProfileScreen(false);
-    setIsMainScreen(true); // Повертаємося на головний екран
+    setIsMainScreen(true);
     alert('Ви вийшли з облікового запису');
   }, []);
 
   const handleGoToMainScreen = () => {
     setIsProfileScreen(false);
     setIsAuthScreen(false);
-    setIsMainScreen(true); // Повертаємося на головний екран без логауту
+    setIsMainScreen(true);
   };
 
   const fetchLessons = useCallback(async () => {
@@ -294,7 +296,6 @@ function App() {
     setExpandedLesson(expandedLesson === lessonId ? null : lessonId);
   };
 
-  // Функція для відключення контекстного меню та перетягування
   const handleImageProtection = (e) => {
     e.preventDefault();
     return false;
@@ -302,7 +303,6 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8">
-      {/* Головний екран */}
       {(!token || isMainScreen) && !isAuthScreen ? (
         <div className="w-full max-w-5xl flex flex-col items-center">
           <header className="w-full flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
