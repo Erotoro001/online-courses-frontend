@@ -26,6 +26,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isAuthScreen, setIsAuthScreen] = useState(false);
   const [isProfileScreen, setIsProfileScreen] = useState(false);
+  const [isMainScreen, setIsMainScreen] = useState(true); // Новий стан для головного екрану
   const [expandedLesson, setExpandedLesson] = useState(null);
   const [theme, setTheme] = useState('light');
 
@@ -45,7 +46,7 @@ function App() {
     },
     3: {
       title: 'Урок 2 | Гідросфера',
-      theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на commands і ландшафти.',
+      theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на клімат і ландшафти.',
       image: lesson3Image,
     },
     4: {
@@ -116,6 +117,7 @@ function App() {
       localStorage.setItem('token', newToken);
       setError(null);
       setIsAuthScreen(false);
+      setIsMainScreen(false); // Після входу переходимо до курсів
       alert('Вхід успішний');
     } catch (error) {
       console.error('Помилка входу:', error.response?.data || error.message);
@@ -131,8 +133,15 @@ function App() {
     setError(null);
     setIsAuthScreen(false);
     setIsProfileScreen(false);
+    setIsMainScreen(true); // Повертаємося на головний екран
     alert('Ви вийшли з облікового запису');
   }, []);
+
+  const handleGoToMainScreen = () => {
+    setIsProfileScreen(false);
+    setIsAuthScreen(false);
+    setIsMainScreen(true); // Повертаємося на головний екран без логауту
+  };
 
   const fetchLessons = useCallback(async () => {
     if (!token) {
@@ -199,14 +208,14 @@ function App() {
   }, [token, handleLogout, API_URL]);
 
   useEffect(() => {
-    if (token && !isProfileScreen) {
+    if (token && !isProfileScreen && !isMainScreen) {
       fetchLessons();
       fetchResults();
     }
     if (token && isProfileScreen) {
       fetchUserProfile();
     }
-  }, [token, fetchLessons, fetchResults, fetchUserProfile, isProfileScreen]);
+  }, [token, fetchLessons, fetchResults, fetchUserProfile, isProfileScreen, isMainScreen]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -292,19 +301,20 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-6">
-      {!token && !isAuthScreen ? (
-        <div className="w-full max-w-4xl flex flex-col items-center">
-          <header className="w-full flex justify-between items-center mb-6">
+    <div className="min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8">
+      {/* Головний екран */}
+      {(!token || isMainScreen) && !isAuthScreen ? (
+        <div className="w-full max-w-5xl flex flex-col items-center">
+          <header className="w-full flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
             <button
               onClick={toggleTheme}
-              className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
             >
               {theme === 'light' ? 'Темна тема' : 'Світла тема'}
             </button>
             <button
               onClick={() => setIsAuthScreen(true)}
-              className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+              className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
             >
               <FiLogIn /> <span>Логін/Реєстрація</span>
             </button>
@@ -313,26 +323,26 @@ function App() {
             <img
               src={mainPageImageSrc}
               alt="GeoLearn Main Page"
-              className="main-page-image w-full max-w-md mx-auto mb-6 rounded-lg shadow-md"
+              className="main-page-image w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto mb-6 rounded-lg shadow-md"
               onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found')}
               loading="lazy"
               onContextMenu={handleImageProtection}
               onDragStart={handleImageProtection}
             />
-            <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-transparent bg-clip-text">
+            <h1 className="text-3xl sm:text-4xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-transparent bg-clip-text">
               GeoLearn
             </h1>
-            <p className="text-lg text-textSecondary mb-6">
+            <p className="text-base sm:text-lg text-textSecondary mb-6 px-2">
               Веб-застосунок GeoLearn створений для зручного вивчення географії через інтерактивні уроки та тести. Ви можете ознайомитися з теоретичним матеріалом, пройти тести та відстежувати свої результати. Зареєструйтеся, щоб розпочати навчання!
             </p>
             <button
               onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
-              className="mb-4 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              className="mb-4 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
             >
               Дізнатися більше
             </button>
           </main>
-          <footer className="mt-auto text-textSecondary text-sm text-center">
+          <footer className="mt-auto text-textSecondary text-xs sm:text-sm text-center">
             <p>Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К</p>
             <p>
               © 2025 Гопка Максим Сергійович. Усі права захищені. Ліцензія:{' '}
@@ -349,121 +359,121 @@ function App() {
         </div>
       ) : !token && isAuthScreen ? (
         <div className="w-full max-w-md bg-cardBackground rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold text-textPrimary mb-6 text-center">Реєстрація / Вхід</h1>
-          {error && <p className="text-error mb-4">{error}</p>}
+          <h1 className="text-xl sm:text-2xl font-bold text-textPrimary mb-6 text-center">Реєстрація / Вхід</h1>
+          {error && <p className="text-error mb-4 text-sm sm:text-base">{error}</p>}
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
           />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Пароль"
-            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
           />
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               onClick={handleRegister}
-              className="flex-1 bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition"
+              className="flex-1 bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
             >
               Зареєструватися
             </button>
             <button
               onClick={handleLogin}
-              className="flex-1 bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition"
+              className="flex-1 bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
             >
               Увійти
             </button>
           </div>
         </div>
       ) : isProfileScreen ? (
-        <div className="w-full max-w-4xl flex flex-col min-h-screen">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex space-x-4">
+        <div className="w-full max-w-5xl flex flex-col min-h-screen">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-center">
               <button
-                onClick={() => {
-                  setIsProfileScreen(false);
-                  setIsAuthScreen(false);
-                }}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                onClick={handleGoToMainScreen}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 <FaHome /> <span>Головна сторінка</span>
               </button>
               <button
-                onClick={() => setIsProfileScreen(false)}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                onClick={() => {
+                  setIsProfileScreen(false);
+                  setIsMainScreen(false);
+                }}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 <span>Курси</span>
               </button>
-              <h1 className="header-title text-3xl font-bold">Особистий кабінет</h1>
+              <h1 className="header-title text-2xl sm:text-3xl font-bold">Особистий кабінет</h1>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={toggleTheme}
-                className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
               <button
                 onClick={() => setIsProfileScreen(true)}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 <FiUser /> <span>Особистий кабінет</span>
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm sm:text-base"
               >
                 <FiLogOut /> <span>Вийти</span>
               </button>
             </div>
           </div>
 
-          {error && <p className="text-error mb-4">{error}</p>}
+          {error && <p className="text-error mb-4 text-sm sm:text-base">{error}</p>}
 
           <div className="w-full max-w-md bg-cardBackground rounded-lg shadow-lg p-6 mx-auto">
-            <h2 className="text-2xl font-bold text-textPrimary mb-6 text-center">Редагувати профіль</h2>
+            <h2 className="text-xl sm:text-2xl font-bold text-textPrimary mb-6 text-center">Редагувати профіль</h2>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
             />
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Новий пароль (залиште порожнім, якщо не змінюєте)"
-              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
             />
             <input
               type="text"
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               placeholder="Ім'я"
-              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
             />
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               placeholder="Прізвище"
-              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
             />
             <button
               onClick={handleUpdateProfile}
-              className="w-full bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition"
+              className="w-full bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
             >
               Зберегти зміни
             </button>
           </div>
 
-          <footer class INVEST="mt-auto text-textSecondary text-sm text-center pt-6">
+          <footer className="mt-auto text-textSecondary text-xs sm:text-sm text-center pt-6">
             <p>Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К</p>
             <p>
               © 2025 Гопка Максим Сергійович. Усі права захищені. Ліцензія:{' '}
@@ -479,43 +489,40 @@ function App() {
           </footer>
         </div>
       ) : (
-        <div className="w-full max-w-4xl flex flex-col min-h-screen">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex space-x-4">
+        <div className="w-full max-w-5xl flex flex-col min-h-screen">
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-center">
               <button
-                onClick={() => {
-                  setIsProfileScreen(false);
-                  setIsAuthScreen(false);
-                }}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                onClick={handleGoToMainScreen}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 <FaHome /> <span>Головна сторінка</span>
               </button>
-              <h1 className="header-title text-3xl font-bold">Курси</h1>
+              <h1 className="header-title text-2xl sm:text-3xl font-bold">Курси</h1>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
               <button
                 onClick={toggleTheme}
-                className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
               <button
                 onClick={() => setIsProfileScreen(true)}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
               >
                 <FiUser /> <span>Особистий кабінет</span>
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+                className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm sm:text-base"
               >
                 <FiLogOut /> <span>Вийти</span>
               </button>
             </div>
           </div>
 
-          {error && <p className="text-error mb-4">{error}</p>}
+          {error && <p className="text-error mb-4 text-sm sm:text-base">{error}</p>}
 
           {loading ? (
             <div className="flex justify-center items-center">
@@ -541,19 +548,19 @@ function App() {
               </svg>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
               {lessons.map((lesson) => {
                 const lessonResults = results.filter((result) => result.lessonId === lesson.id);
                 const completed = lessonResults.length > 0;
                 return (
                   <div
                     key={lesson.id}
-                    className="lesson-card rounded-lg shadow-md p-6 hover:shadow-lg transition"
+                    className="lesson-card rounded-lg shadow-md p-4 sm:p-6 hover:shadow-lg transition"
                   >
                     <img
                       src={lessonData[lesson.id]?.image}
                       alt={lessonData[lesson.id]?.title}
-                      className="lesson-image w-full h-40 object-cover rounded-lg mb-4"
+                      className="lesson-image w-full h-32 sm:h-40 object-cover rounded-lg mb-4"
                       onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found')}
                       loading="lazy"
                       onContextMenu={handleImageProtection}
@@ -565,7 +572,7 @@ function App() {
                       {lesson.id === 3 && <FaWater className="text-primary" />}
                       {lesson.id === 4 && <FaUsers className="text-primary" />}
                       <h2
-                        className="lesson-title text-xl font-semibold mb-2 cursor-pointer"
+                        className="lesson-title text-lg sm:text-xl font-semibold mb-2 cursor-pointer"
                         onClick={() => toggleLesson(lesson.id)}
                       >
                         {lessonData[lesson.id]?.title || lesson.title}
@@ -584,10 +591,10 @@ function App() {
                         exit={{ height: 0, opacity: 0 }}
                         className="mb-4"
                       >
-                        <p className="text-textSecondary mb-4">{lessonData[lesson.id]?.theory}</p>
+                        <p className="text-textSecondary mb-4 text-sm sm:text-base">{lessonData[lesson.id]?.theory}</p>
                         <button
                           onClick={() => startTest(lesson.id)}
-                          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
                         >
                           Пройти тест
                         </button>
@@ -599,23 +606,23 @@ function App() {
             </div>
           )}
 
-          <div className="bg-cardBackground rounded-lg shadow-md p-6">
-            <h2 className="results-header text-2xl font-semibold mb-4">Ваші результати</h2>
+          <div className="bg-cardBackground rounded-lg shadow-md p-4 sm:p-6">
+            <h2 className="results-header text-xl sm:text-2xl font-semibold mb-4">Ваші результати</h2>
             {results.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full text-left">
+                <table className="w-full text-left text-sm sm:text-base">
                   <thead>
                     <tr className="border-b">
-                      <th className="p-3 text-textPrimary">Урок</th>
-                      <th className="p-3 text-textPrimary">Оцінка (%)</th>
-                      <th className="p-3 text-textPrimary">Дата та час</th>
+                      <th className="p-2 sm:p-3 text-textPrimary">Урок</th>
+                      <th className="p-2 sm:p-3 text-textPrimary">Оцінка (%)</th>
+                      <th className="p-2 sm:p-3 text-textPrimary">Дата та час</th>
                     </tr>
                   </thead>
                   <tbody>
                     {results.map((result, index) => (
                       <tr key={index} className="border-b">
-                        <td className="p-3">{lessonData[result.lessonId]?.title || `Урок ${result.lessonId}`}</td>
-                        <td className="p-3 flex items-center space-x-2">
+                        <td className="p-2 sm:p-3">{lessonData[result.lessonId]?.title || `Урок ${result.lessonId}`}</td>
+                        <td className="p-2 sm:p-3 flex items-center space-x-2">
                           {result.score >= 60 ? (
                             <FaCheckCircle className="text-success" />
                           ) : (
@@ -623,7 +630,7 @@ function App() {
                           )}
                           <span>{result.score.toFixed(2)}%</span>
                         </td>
-                        <td className="p-3">
+                        <td className="p-2 sm:p-3">
                           {new Date(result.createdAt).toLocaleString('uk-UA', {
                             day: '2-digit',
                             month: '2-digit',
@@ -638,11 +645,11 @@ function App() {
                 </table>
               </div>
             ) : (
-              <p className="text-textSecondary">Ви ще не проходили тести.</p>
+              <p className="text-textSecondary text-sm sm:text-base">Ви ще не проходили тести.</p>
             )}
           </div>
 
-          <footer className="mt-auto text-textSecondary text-sm text-center pt-6">
+          <footer className="mt-auto text-textSecondary text-xs sm:text-sm text-center pt-6">
             <p>Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К</p>
             <p>
               © 2025 Гопка Максим Сергійович. Усі права захищені. Ліцензія:{' '}
@@ -665,13 +672,13 @@ function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+            className="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="modal-content rounded-lg p-6 w-full max-w-md relative"
+              className="modal-content rounded-lg p-4 sm:p-6 w-full max-w-md relative"
             >
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -679,10 +686,10 @@ function App() {
               >
                 ✕
               </button>
-              <h2 className="modal-text text-xl font-semibold mb-4">
+              <h2 className="modal-text text-lg sm:text-xl font-semibold mb-4">
                 Тест для {lessonData[currentLessonId]?.title || `Урок ${currentLessonId}`}
               </h2>
-              <p className="modal-text text-textSecondary mb-4">
+              <p className="modal-text text-textSecondary mb-4 text-sm sm:text-base">
                 Питання {currentQuestionIndex + 1} із {questions[currentLessonId].length}
               </p>
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
@@ -691,7 +698,7 @@ function App() {
                   style={{ width: `${((currentQuestionIndex + 1) / questions[currentLessonId].length) * 100}%` }}
                 ></div>
               </div>
-              <p className="modal-question text-lg mb-4">
+              <p className="modal-question text-base sm:text-lg mb-4">
                 {questions[currentLessonId][currentQuestionIndex].question}
               </p>
               <div className="space-y-2">
@@ -699,7 +706,7 @@ function App() {
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
-                    className="modal-option w-full text-left p-3 border rounded-lg hover:bg-secondary transition"
+                    className="modal-option w-full text-left p-3 border rounded-lg hover:bg-secondary transition text-sm sm:text-base"
                   >
                     {option}
                   </button>
