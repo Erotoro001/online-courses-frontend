@@ -30,27 +30,27 @@ function App() {
     1: {
       title: 'Вступ | Вступ до географії',
       theory: 'Географія — це наука, яка вивчає просторові закономірності розміщення природних, соціальних та економічних явищ на Землі. Вона поділяється на фізичну географію (вивчення природних об’єктів, таких як гори, річки, клімат) і соціально-економічну географію (дослідження людської діяльності, наприклад, населення, економіки, культури). У цьому вступному уроці ми розглянемо основні поняття, методи та історію розвитку географії як науки.',
-      image: lesson1Image, // Зображення для уроку 1
+      image: lesson1Image,
     },
     2: {
       title: 'Урок 1 | Клімат і погода',
       theory: 'Клімат — це багаторічний режим погоди, характерний для певної місцевості. Погода може змінюватися щодня, тоді як клімат є більш стабільним. Основні елементи клімату: температура, опади, вологість, атмосферний тиск. У цьому уроці ми дізнаємося, як формуються кліматичні зони, які фактори впливають на клімат (наприклад, широта, висота над рівнем моря, океанічні течії), і як клімат впливає на життя людей.',
-      image: lesson2Image, // Зображення для уроку 2
+      image: lesson2Image,
     },
     3: {
       title: 'Урок 2 | Гідросфера',
       theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на клімат і ландшафти.',
-      image: lesson3Image, // Зображення для уроку 3
+      image: lesson3Image,
     },
     4: {
       title: 'Урок 3 | Населення світу',
       theory: 'Населення світу налічує понад 8 мільярдів людей (станом на 2025 рік). У цьому уроці ми розглянемо демографічні процеси: народжуваність, смертність, міграцію. Також вивчимо, як населення розподілене по континентах, які регіони є найбільш густонаселеними (наприклад, Південно-Східна Азія), і які фактори впливають на зростання населення (економіка, культура, освіта).',
-      image: lesson4Image, // Зображення для уроку 4
+      image: lesson4Image,
     },
   };
 
   // Зображення для головної сторінки
-  const mainPageImage = mainPageImage;
+  const mainPageImageSrc = mainPageImage;
 
   // Питання для тестів (5 питань, 4 варіанти, 1 правильна відповідь)
   const questions = {
@@ -171,6 +171,10 @@ function App() {
   }, [token, fetchLessons, fetchResults]);
 
   const startTest = (lessonId) => {
+    if (!lessonId || !questions[lessonId]) {
+      console.error('Некоректний lessonId для тесту:', lessonId);
+      return;
+    }
     setCurrentLessonId(lessonId);
     setCurrentQuestionIndex(0);
     setTestScore(0);
@@ -178,7 +182,13 @@ function App() {
   };
 
   const handleAnswer = (selectedOption) => {
-    const currentQuestions = questions[currentLessonId] || questions[1];
+    if (!currentLessonId || !questions[currentLessonId]) {
+      console.error('Некоректний lessonId:', currentLessonId);
+      setIsModalOpen(false);
+      return;
+    }
+
+    const currentQuestions = questions[currentLessonId];
     const currentQuestion = currentQuestions[currentQuestionIndex];
     const isCorrect = selectedOption === currentQuestion.answer;
     if (isCorrect) {
@@ -233,9 +243,11 @@ function App() {
           </header>
           <main className="text-center flex-1">
             <img
-              src={mainPageImage}
+              src={mainPageImageSrc}
               alt="GeoLearn Main Page"
               className="w-full max-w-md mx-auto mb-6 rounded-lg shadow-md"
+              onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found')}
+              loading="lazy"
             />
             <h1 className="text-4xl font-bold text-textPrimary mb-4">GeoLearn</h1>
             <p className="text-lg text-gray-600 mb-8">
@@ -306,6 +318,8 @@ function App() {
                     src={lessonData[lesson.id]?.image}
                     alt={lessonData[lesson.id]?.title}
                     className="w-full h-40 object-cover rounded-lg mb-4"
+                    onError={(e) => (e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Found')}
+                    loading="lazy"
                   />
                   <h2
                     className="text-xl font-semibold text-textPrimary mb-2 cursor-pointer"
