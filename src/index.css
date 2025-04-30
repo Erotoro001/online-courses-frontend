@@ -20,6 +20,10 @@ body.light {
   --inputBg: #ffffff; /* Фон для інпутів */
   --headerText: #1f2937; /* Темний текст для заголовків у світлій темі */
   --lessonTitle: #1f2937; /* Темний текст для назв уроків */
+  --resultsHeaderText: #1f2937; /* Темний текст для заголовка "Ваші результати" */
+  --modalBg: #ffffff; /* Білий фон для модального вікна */
+  --modalText: #1f2937; /* Темний текст у модальному вікні */
+  --modalQuestionText: #111827; /* Ще темніший текст для питань */
 }
 
 body.dark {
@@ -33,6 +37,10 @@ body.dark {
   --inputBg: #4b5563; /* Темний фон для інпутів */
   --headerText: #ffffff; /* Білий текст для заголовків у темній темі */
   --lessonTitle: #d1d5db; /* Світло-сірий текст для назв уроків */
+  --resultsHeaderText: #f9fafb; /* Білий текст для заголовка "Ваші результати" */
+  --modalBg: #2d3748; /* Темний фон для модального вікна */
+  --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
+  --modalQuestionText: #f9fafb; /* Білий текст для питань */
 }
 
 body {
@@ -53,6 +61,32 @@ h1.header-title {
 h2.lesson-title {
   color: var(--lessonTitle);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для заголовка "Ваші результати" */
+h2.results-header {
+  color: var(--resultsHeaderText);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для модального вікна */
+.modal-content {
+  background-color: var(--modalBg);
+}
+
+.modal-text {
+  color: var(--modalText);
+}
+
+.modal-question {
+  color: var(--modalQuestionText);
+  font-weight: 600; /* Жирніший текст для питань */
+}
+
+/* Стилі для кнопок у модальному вікні */
+.modal-option {
+  color: var(--modalText);
+  border-color: var(--borderColor);
 }
 
 /* Стилі для кнопок */

@@ -418,7 +418,7 @@ function App() {
           )}
 
           <div className="bg-cardBackground rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-semibold text-textPrimary mb-4">Ваші результати</h2>
+            <h2 className="results-header text-2xl font-semibold mb-4">Ваші результати</h2>
             {results.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
@@ -474,7 +474,7 @@ function App() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-cardBackground rounded-lg p-6 w-full max-w-md relative"
+              className="modal-content rounded-lg p-6 w-full max-w-md relative"
             >
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -482,10 +482,10 @@ function App() {
               >
                 ✕
               </button>
-              <h2 className="text-xl font-semibold text-textPrimary mb-4">
+              <h2 className="modal-text text-xl font-semibold mb-4">
                 Тест для {lessonData[currentLessonId]?.title || `Урок ${currentLessonId}`}
               </h2>
-              <p className="text-textSecondary mb-4">
+              <p className="modal-text text-textSecondary mb-4">
                 Питання {currentQuestionIndex + 1} із {questions[currentLessonId].length}
               </p>
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
@@ -494,7 +494,7 @@ function App() {
                   style={{ width: `${((currentQuestionIndex + 1) / questions[currentLessonId].length) * 100}%` }}
                 ></div>
               </div>
-              <p className="text-lg font-medium mb-4">
+              <p className="modal-question text-lg mb-4">
                 {questions[currentLessonId][currentQuestionIndex].question}
               </p>
               <div className="space-y-2">
@@ -502,7 +502,7 @@ function App() {
                   <button
                     key={index}
                     onClick={() => handleAnswer(option)}
-                    className="w-full text-left p-3 border rounded-lg hover:bg-secondary transition text-textPrimary"
+                    className="modal-option w-full text-left p-3 border rounded-lg hover:bg-secondary transition"
                   >
                     {option}
                   </button>
