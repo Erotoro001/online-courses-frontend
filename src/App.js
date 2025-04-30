@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { FiLogOut, FiLogIn } from 'react-icons/fi';
-import { FaGlobe, FaCloudSun, FaWater, FaUsers, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { FiLogOut, FiLogIn, FiUser } from 'react-icons/fi';
+import { FaGlobe, FaCloudSun, FaWater, FaUsers, FaCheckCircle, FaTimesCircle, FaHome } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import mainPageImage from './assets/images/main-page.jpg';
 import lesson1Image from './assets/images/lesson1.jpg';
@@ -12,6 +12,9 @@ import lesson4Image from './assets/images/lesson4.jpg';
 function App() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [lessons, setLessons] = useState([]);
   const [results, setResults] = useState([]);
@@ -22,6 +25,7 @@ function App() {
   const [testScore, setTestScore] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isAuthScreen, setIsAuthScreen] = useState(false);
+  const [isProfileScreen, setIsProfileScreen] = useState(false);
   const [expandedLesson, setExpandedLesson] = useState(null);
   const [theme, setTheme] = useState('light');
 
@@ -41,7 +45,7 @@ function App() {
     },
     3: {
       title: 'Урок 2 | Гідросфера',
-      theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на клімат і ландшафти.',
+      theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на commands і ландшафти.',
       image: lesson3Image,
     },
     4: {
@@ -126,6 +130,7 @@ function App() {
     setResults([]);
     setError(null);
     setIsAuthScreen(false);
+    setIsProfileScreen(false);
     alert('Ви вийшли з облікового запису');
   }, []);
 
@@ -173,12 +178,53 @@ function App() {
     }
   }, [token, handleLogout, API_URL]);
 
+  const fetchUserProfile = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API_URL}/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setEmail(response.data.email);
+      setFirstName(response.data.firstName || '');
+      setLastName(response.data.lastName || '');
+      setError(null);
+    } catch (error) {
+      console.error('Помилка завантаження профілю:', error.response?.data || error.message);
+      if (error.response?.status === 401) {
+        setError('Сесія закінчилася. Увійдіть заново.');
+        handleLogout();
+      } else {
+        setError('Помилка завантаження профілю: ' + (error.response?.data?.error || error.message));
+      }
+    }
+  }, [token, handleLogout, API_URL]);
+
   useEffect(() => {
-    if (token) {
+    if (token && !isProfileScreen) {
       fetchLessons();
       fetchResults();
     }
-  }, [token, fetchLessons, fetchResults]);
+    if (token && isProfileScreen) {
+      fetchUserProfile();
+    }
+  }, [token, fetchLessons, fetchResults, fetchUserProfile, isProfileScreen]);
+
+  const handleUpdateProfile = async () => {
+    try {
+      const updateData = { email, firstName, lastName };
+      if (newPassword) {
+        updateData.password = newPassword;
+      }
+      await axios.put(`${API_URL}/profile`, updateData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setNewPassword('');
+      alert('Профіль успішно оновлено');
+      setError(null);
+    } catch (error) {
+      console.error('Помилка оновлення профілю:', error.response?.data || error.message);
+      setError('Помилка оновлення профілю: ' + (error.response?.data?.error || error.message));
+    }
+  };
 
   const startTest = (lessonId) => {
     if (!lessonId || !questions[lessonId]) {
@@ -334,16 +380,131 @@ function App() {
             </button>
           </div>
         </div>
-      ) : (
+      ) : isProfileScreen ? (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="header-title text-3xl font-bold">Уроки</h1>
+            <div className="flex space-x-4">
+              <button
+                onClick={() => {
+                  setIsProfileScreen(false);
+                  setIsAuthScreen(false);
+                }}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                <FaHome /> <span>Головна сторінка</span>
+              </button>
+              <button
+                onClick={() => setIsProfileScreen(false)}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                <span>Курси</span>
+              </button>
+              <h1 className="header-title text-3xl font-bold">Особистий кабінет</h1>
+            </div>
             <div className="flex space-x-4">
               <button
                 onClick={toggleTheme}
                 className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
+              </button>
+              <button
+                onClick={() => setIsProfileScreen(true)}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                <FiUser /> <span>Особистий кабінет</span>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+              >
+                <FiLogOut /> <span>Вийти</span>
+              </button>
+            </div>
+          </div>
+
+          {error && <p className="text-error mb-4">{error}</p>}
+
+          <div className="w-full max-w-md bg-cardBackground rounded-lg shadow-lg p-6 mx-auto">
+            <h2 className="text-2xl font-bold text-textPrimary mb-6 text-center">Редагувати профіль</h2>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Новий пароль (залиште порожнім, якщо не змінюєте)"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              placeholder="Ім'я"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              placeholder="Прізвище"
+              className="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+            <button
+              onClick={handleUpdateProfile}
+              className="w-full bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition"
+            >
+              Зберегти зміни
+            </button>
+          </div>
+
+          <footer class INVEST="mt-auto text-textSecondary text-sm text-center pt-6">
+            <p>Розробник: Гопка Максим Сергійович, 4 курс, група ІПЗ-49К</p>
+            <p>
+              © 2025 Гопка Максим Сергійович. Усі права захищені. Ліцензія:{' '}
+              <a
+                href="https://github.com/erotoro001/online-courses-frontend/blob/main/LICENSE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-primary"
+              >
+                MIT License
+              </a>
+            </p>
+          </footer>
+        </div>
+      ) : (
+        <div className="w-full max-w-4xl flex flex-col min-h-screen">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex space-x-4">
+              <button
+                onClick={() => {
+                  setIsProfileScreen(false);
+                  setIsAuthScreen(false);
+                }}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                <FaHome /> <span>Головна сторінка</span>
+              </button>
+              <h1 className="header-title text-3xl font-bold">Курси</h1>
+            </div>
+            <div className="flex space-x-4">
+              <button
+                onClick={toggleTheme}
+                className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                {theme === 'light' ? 'Темна тема' : 'Світла тема'}
+              </button>
+              <button
+                onClick={() => setIsProfileScreen(true)}
+                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                <FiUser /> <span>Особистий кабінет</span>
               </button>
               <button
                 onClick={handleLogout}
