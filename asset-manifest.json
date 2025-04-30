@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/online-courses-frontend/static/css/main.ff4a4d33.css",
-    "main.js": "/online-courses-frontend/static/js/main.bfdbb75d.js",
+    "main.css": "/online-courses-frontend/static/css/main.45a94201.css",
+    "main.js": "/online-courses-frontend/static/js/main.d03c8840.js",
     "index.html": "/online-courses-frontend/index.html",
-    "main.ff4a4d33.css.map": "/online-courses-frontend/static/css/main.ff4a4d33.css.map",
-    "main.bfdbb75d.js.map": "/online-courses-frontend/static/js/main.bfdbb75d.js.map"
+    "main.45a94201.css.map": "/online-courses-frontend/static/css/main.45a94201.css.map",
+    "main.d03c8840.js.map": "/online-courses-frontend/static/js/main.d03c8840.js.map"
   },
   "entrypoints": [
-    "static/css/main.ff4a4d33.css",
-    "static/js/main.bfdbb75d.js"
+    "static/css/main.45a94201.css",
+    "static/js/main.d03c8840.js"
   ]
 }
