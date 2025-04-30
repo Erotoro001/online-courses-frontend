@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiLogIn } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import mainPageImage from './assets/images/main-page.jpg';
+import lesson1Image from './assets/images/lesson1.jpg';
+import lesson2Image from './assets/images/lesson2.jpg';
+import lesson3Image from './assets/images/lesson3.jpg';
+import lesson4Image from './assets/images/lesson4.jpg';
 
 function App() {
   const [email, setEmail] = useState('');
@@ -20,25 +25,32 @@ function App() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
 
-  // Дані уроків із теоретичним матеріалом
+  // Дані уроків із теоретичним матеріалом і зображеннями
   const lessonData = {
     1: {
-      title: 'Урок 1 | Вступ до географії',
+      title: 'Вступ | Вступ до географії',
       theory: 'Географія — це наука, яка вивчає просторові закономірності розміщення природних, соціальних та економічних явищ на Землі. Вона поділяється на фізичну географію (вивчення природних об’єктів, таких як гори, річки, клімат) і соціально-економічну географію (дослідження людської діяльності, наприклад, населення, економіки, культури). У цьому вступному уроці ми розглянемо основні поняття, методи та історію розвитку географії як науки.',
+      image: lesson1Image, // Зображення для уроку 1
     },
     2: {
-      title: 'Урок 2 | Клімат і погода',
+      title: 'Урок 1 | Клімат і погода',
       theory: 'Клімат — це багаторічний режим погоди, характерний для певної місцевості. Погода може змінюватися щодня, тоді як клімат є більш стабільним. Основні елементи клімату: температура, опади, вологість, атмосферний тиск. У цьому уроці ми дізнаємося, як формуються кліматичні зони, які фактори впливають на клімат (наприклад, широта, висота над рівнем моря, океанічні течії), і як клімат впливає на життя людей.',
+      image: lesson2Image, // Зображення для уроку 2
     },
     3: {
-      title: 'Урок 3 | Гідросфера',
+      title: 'Урок 2 | Гідросфера',
       theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки, озера, льодовики та підземні води. Світовий океан займає 71% поверхні планети. У цьому уроці ми розглянемо кругообіг води в природі, основні характеристики океанів (солоність, течії), а також значення води для життя на Землі та її вплив на клімат і ландшафти.',
+      image: lesson3Image, // Зображення для уроку 3
     },
     4: {
-      title: 'Урок 4 | Населення світу',
+      title: 'Урок 3 | Населення світу',
       theory: 'Населення світу налічує понад 8 мільярдів людей (станом на 2025 рік). У цьому уроці ми розглянемо демографічні процеси: народжуваність, смертність, міграцію. Також вивчимо, як населення розподілене по континентах, які регіони є найбільш густонаселеними (наприклад, Південно-Східна Азія), і які фактори впливають на зростання населення (економіка, культура, освіта).',
+      image: lesson4Image, // Зображення для уроку 4
     },
   };
+
+  // Зображення для головної сторінки
+  const mainPageImage = mainPageImage;
 
   // Питання для тестів (5 питань, 4 варіанти, 1 правильна відповідь)
   const questions = {
@@ -214,12 +226,17 @@ function App() {
           <header className="w-full flex justify-end mb-6">
             <button
               onClick={() => setIsAuthScreen(true)}
-              className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+              className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
             >
-              Логін/Реєстрація
+              <FiLogIn /> <span>Логін/Реєстрація</span>
             </button>
           </header>
           <main className="text-center flex-1">
+            <img
+              src={mainPageImage}
+              alt="GeoLearn Main Page"
+              className="w-full max-w-md mx-auto mb-6 rounded-lg shadow-md"
+            />
             <h1 className="text-4xl font-bold text-textPrimary mb-4">GeoLearn</h1>
             <p className="text-lg text-gray-600 mb-8">
               Веб-застосунок GeoLearn створений для зручного вивчення географії через інтерактивні уроки та тести. Ви можете ознайомитися з теоретичним матеріалом, пройти тести та відстежувати свої результати. Зареєструйтеся, щоб розпочати навчання!
@@ -285,6 +302,11 @@ function App() {
                   key={lesson.id}
                   className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition"
                 >
+                  <img
+                    src={lessonData[lesson.id]?.image}
+                    alt={lessonData[lesson.id]?.title}
+                    className="w-full h-40 object-cover rounded-lg mb-4"
+                  />
                   <h2
                     className="text-xl font-semibold text-textPrimary mb-2 cursor-pointer"
                     onClick={() => toggleLesson(lesson.id)}
@@ -292,7 +314,12 @@ function App() {
                     {lessonData[lesson.id]?.title || lesson.title}
                   </h2>
                   {expandedLesson === lesson.id && (
-                    <div className="mb-4">
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="mb-4"
+                    >
                       <p className="text-gray-600 mb-4">{lessonData[lesson.id]?.theory}</p>
                       <button
                         onClick={() => startTest(lesson.id)}
@@ -300,7 +327,7 @@ function App() {
                       >
                         Пройти тест
                       </button>
-                    </div>
+                    </motion.div>
                   )}
                 </div>
               ))}
