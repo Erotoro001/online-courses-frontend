@@ -318,7 +318,7 @@ function App() {
       ) : (
         <div className="w-full max-w-4xl">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-textPrimary">Уроки</h1>
+            <h1 className="header-title text-3xl font-bold">Уроки</h1>
             <div className="flex space-x-4">
               <button
                 onClick={toggleTheme}
@@ -383,7 +383,7 @@ function App() {
                       {lesson.id === 3 && <FaWater className="text-primary" />}
                       {lesson.id === 4 && <FaUsers className="text-primary" />}
                       <h2
-                        className="text-xl font-semibold text-textPrimary mb-2 cursor-pointer"
+                        className="lesson-title text-xl font-semibold mb-2 cursor-pointer"
                         onClick={() => toggleLesson(lesson.id)}
                       >
                         {lessonData[lesson.id]?.title || lesson.title}

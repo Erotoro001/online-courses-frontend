@@ -18,17 +18,21 @@ body.light {
   --buttonText: #1f2937; /* Темний текст для кнопок */
   --borderColor: #d1d5db; /* Світло-сірий для меж */
   --inputBg: #ffffff; /* Фон для інпутів */
+  --headerText: #1f2937; /* Темний текст для заголовків у світлій темі */
+  --lessonTitle: #1f2937; /* Темний текст для назв уроків */
 }
 
 body.dark {
   --background: #1f2937;
-  --cardBackground: #374151;
-  --textPrimary: #f9fafb;
+  --cardBackground: #2d3748; /* Темніший фон для карток у темній темі */
+  --textPrimary: #e5e7eb; /* Світліший текст для кращої видимості */
   --textSecondary: #9ca3af;
   --buttonBg: #4b5563; /* Темно-сірий фон для кнопок у темній темі */
   --buttonText: #f9fafb; /* Світлий текст для кнопок */
   --borderColor: #4b5563; /* Темно-сірий для меж */
   --inputBg: #4b5563; /* Темний фон для інпутів */
+  --headerText: #ffffff; /* Білий текст для заголовків у темній темі */
+  --lessonTitle: #d1d5db; /* Світло-сірий текст для назв уроків */
 }
 
 body {
@@ -37,6 +41,18 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--background);
   color: var(--textPrimary);
+}
+
+/* Стилі для заголовків (наприклад, "Уроки") */
+h1.header-title {
+  color: var(--headerText);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для назв уроків */
+h2.lesson-title {
+  color: var(--lessonTitle);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
 }
 
 /* Стилі для кнопок */
