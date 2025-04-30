@@ -31,7 +31,7 @@ function App() {
   const [theme, setTheme] = useState('light');
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
-  console.log('API_URL:', API_URL); // Додаємо логування API_URL
+  console.log('API_URL:', API_URL);
 
   const lessonData = {
     1: {
@@ -306,18 +306,63 @@ function App() {
       {(!token || isMainScreen) && !isAuthScreen ? (
         <div className="w-full max-w-5xl flex flex-col items-center">
           <header className="w-full flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
-            <button
-              onClick={toggleTheme}
-              className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
-            >
-              {theme === 'light' ? 'Темна тема' : 'Світла тема'}
-            </button>
-            <button
-              onClick={() => setIsAuthScreen(true)}
-              className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
-            >
-              <FiLogIn /> <span>Логін/Реєстрація</span>
-            </button>
+            {/* Хедер для залогінених і незалогінених користувачів */}
+            {token ? (
+              <>
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-center">
+                  <button
+                    onClick={handleGoToMainScreen}
+                    className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
+                  >
+                    <FaHome /> <span>Головна сторінка</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsProfileScreen(false);
+                      setIsMainScreen(false);
+                    }}
+                    className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
+                  >
+                    <span>Курси</span>
+                  </button>
+                </div>
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <button
+                    onClick={toggleTheme}
+                    className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
+                  >
+                    {theme === 'light' ? 'Темна тема' : 'Світла тема'}
+                  </button>
+                  <button
+                    onClick={() => setIsProfileScreen(true)}
+                    className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
+                  >
+                    <FiUser /> <span>Особистий кабінет</span>
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition text-sm sm:text-base"
+                  >
+                    <FiLogOut /> <span>Вийти</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={toggleTheme}
+                  className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition text-sm sm:text-base"
+                >
+                  {theme === 'light' ? 'Темна тема' : 'Світла тема'}
+                </button>
+                <button
+                  onClick={() => setIsAuthScreen(true)}
+                  className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm sm:text-base"
+                >
+                  <FiLogIn /> <span>Логін/Реєстрація</span>
+                </button>
+              </>
+            )}
           </header>
           <main className="text-center flex-1">
             <img
