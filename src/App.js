@@ -25,71 +25,37 @@ function App() {
   const [testScore, setTestScore] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isAuthScreen, setIsAuthScreen] = useState(false);
-  const [isProfileScreen, setIsProfileScreen] = useState(false);
+  const [currentPage, setCurrentPage] = useState('home');
   const [expandedLesson, setExpandedLesson] = useState(null);
   const [theme, setTheme] = useState('light');
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
 
-  // Дані уроків із теоретичним матеріалом і зображеннями
   const lessonData = {
-    1: {
-      title: 'Вступ | Вступ до географії',
-      theory: 'Географія — це наука, яка вивчає просторові закономірності розміщення природних, соціальних та економічних явищ на Землі...',
-      image: lesson1Image,
-    },
-    2: {
-      title: 'Урок 1 | Клімат і погода',
-      theory: 'Клімат — це багаторічний режим погоди, характерний для певної місцевості...',
-      image: lesson2Image,
-    },
-    3: {
-      title: 'Урок 2 | Гідросфера',
-      theory: 'Гідросфера — це водна оболонка Землі, яка включає океани, моря, річки...',
-      image: lesson3Image,
-    },
-    4: {
-      title: 'Урок 3 | Населення світу',
-      theory: 'Населення світу налічує понад 8 мільярдів людей (станом на 2025 рік)...',
-      image: lesson4Image,
-    },
+    1: { title: 'Вступ | Вступ до географії', theory: 'Географія — це наука...', image: lesson1Image },
+    2: { title: 'Урок 1 | Клімат і погода', theory: 'Клімат — це багаторічний режим...', image: lesson2Image },
+    3: { title: 'Урок 2 | Гідросфера', theory: 'Гідросфера — це водна оболонка...', image: lesson3Image },
+    4: { title: 'Урок 3 | Населення світу', theory: 'Населення світу налічує...', image: lesson4Image },
   };
 
   const mainPageImageSrc = mainPageImage;
 
   const questions = {
-    1: [
-      { question: 'Що вивчає географія?', options: ['Просторові закономірності', 'Хімічні реакції', 'Історію мистецтва', 'Математичні рівняння'], answer: 'Просторові закономірності' },
-      // Інші питання...
-    ],
-    2: [
-      { question: 'Що таке клімат?', options: ['Багаторічний режим погоди', 'Щоденні зміни погоди', 'Температура повітря', 'Кількість опадів'], answer: 'Багаторічний режим погоди' },
-      // Інші питання...
-    ],
-    3: [
-      { question: 'Що входить до гідросфери?', options: ['Океани і річки', 'Гірські породи', 'Атмосферні гази', 'Рослини'], answer: 'Океани і річки' },
-      // Інші питання...
-    ],
-    4: [
-      { question: 'Скільки людей проживає у світі (2025)?', options: ['Понад 8 мільярдів', '5 мільярдів', '10 мільярдів', '3 мільярди'], answer: 'Понад 8 мільярдів' },
-      // Інші питання...
-    ],
+    1: [{ question: 'Що вивчає географія?', options: ['Просторові закономірності', 'Хімічні реакції', 'Історію мистецтва', 'Математичні рівняння'], answer: 'Просторові закономірності' }],
+    2: [{ question: 'Що таке клімат?', options: ['Багаторічний режим погоди', 'Щоденні зміни погоди', 'Температура повітря', 'Кількість опадів'], answer: 'Багаторічний режим погоди' }],
+    3: [{ question: 'Що входить до гідросфери?', options: ['Океани і річки', 'Гірські породи', 'Атмосферні гази', 'Рослини'], answer: 'Океани і річки' }],
+    4: [{ question: 'Скільки людей проживає у світі (2025)?', options: ['Понад 8 мільярдів', '5 мільярдів', '10 мільярдів', '3 мільярди'], answer: 'Понад 8 мільярдів' }],
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
+  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
 
-  useEffect(() => {
-    document.body.className = theme;
-  }, [theme]);
+  useEffect(() => { document.body.className = theme; }, [theme]);
 
   const handleRegister = async () => {
     try {
-      const response = await axios.post(`${API_URL}/register`, { email, password });
-      setError(null);
+      await axios.post(`${API_URL}/register`, { email, password });
       alert('Реєстрація успішна');
-      handleLogin(); // Автоматично входимо після реєстрації
+      handleLogin();
     } catch (error) {
       setError('Помилка реєстрації: ' + (error.response?.data?.error || error.message));
     }
@@ -103,10 +69,8 @@ function App() {
       localStorage.setItem('token', newToken);
       setError(null);
       setIsAuthScreen(false);
-      setIsProfileScreen(false);
+      setCurrentPage('courses');
       alert('Вхід успішний');
-      fetchLessons();
-      fetchResults();
     } catch (error) {
       setError('Помилка входу: ' + (error.response?.data?.error || error.message));
     }
@@ -119,16 +83,14 @@ function App() {
     setResults([]);
     setError(null);
     setIsAuthScreen(false);
-    setIsProfileScreen(false);
+    setCurrentPage('home');
   }, []);
 
   const fetchLessons = useCallback(async () => {
     if (!token) return;
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/lessons`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(`${API_URL}/lessons`, { headers: { Authorization: `Bearer ${token}` } });
       setLessons(response.data);
       setError(null);
     } catch (error) {
@@ -142,9 +104,7 @@ function App() {
   const fetchResults = useCallback(async () => {
     if (!token) return;
     try {
-      const response = await axios.get(`${API_URL}/user-results`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(`${API_URL}/user-results`, { headers: { Authorization: `Bearer ${token}` } });
       setResults(response.data);
       setError(null);
     } catch (error) {
@@ -156,9 +116,7 @@ function App() {
   const fetchUserProfile = useCallback(async () => {
     if (!token) return;
     try {
-      const response = await axios.get(`${API_URL}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get(`${API_URL}/profile`, { headers: { Authorization: `Bearer ${token}` } });
       setEmail(response.data.email);
       setFirstName(response.data.firstName || '');
       setLastName(response.data.lastName || '');
@@ -170,21 +128,19 @@ function App() {
   }, [token, handleLogout]);
 
   useEffect(() => {
-    if (token && !isAuthScreen && !isProfileScreen) {
+    if (token && currentPage === 'courses') {
       fetchLessons();
       fetchResults();
-    } else if (token && isProfileScreen) {
+    } else if (token && currentPage === 'profile') {
       fetchUserProfile();
     }
-  }, [token, isAuthScreen, isProfileScreen, fetchLessons, fetchResults, fetchUserProfile]);
+  }, [token, currentPage, fetchLessons, fetchResults, fetchUserProfile]);
 
   const handleUpdateProfile = async () => {
     try {
       const updateData = { email, firstName, lastName };
       if (newPassword) updateData.password = newPassword;
-      await axios.put(`${API_URL}/profile`, updateData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.put(`${API_URL}/profile`, updateData, { headers: { Authorization: `Bearer ${token}` } });
       setNewPassword('');
       alert('Профіль успішно оновлено');
       setError(null);
@@ -218,9 +174,7 @@ function App() {
   const submitTest = async (finalScore, totalQuestions) => {
     try {
       const scorePercentage = (finalScore / totalQuestions) * 100;
-      await axios.post(`${API_URL}/results`, { lessonId: currentLessonId, score: scorePercentage }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.post(`${API_URL}/results`, { lessonId: currentLessonId, score: scorePercentage }, { headers: { Authorization: `Bearer ${token}` } });
       fetchResults();
       setError(null);
     } catch (error) {
@@ -229,9 +183,7 @@ function App() {
     }
   };
 
-  const toggleLesson = (lessonId) => {
-    setExpandedLesson(expandedLesson === lessonId ? null : lessonId);
-  };
+  const toggleLesson = (lessonId) => setExpandedLesson(expandedLesson === lessonId ? null : lessonId);
 
   const handleImageProtection = (e) => {
     e.preventDefault();
@@ -240,36 +192,45 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center p-6">
-      {!token && !isAuthScreen ? (
+      {currentPage === 'home' && (
         <div className="w-full max-w-4xl flex flex-col items-center">
           <header className="w-full flex justify-between items-center mb-6">
             <div className="flex space-x-4">
-              <button className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+              <button onClick={() => setCurrentPage('home')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                 <FaHome /> <span>Головна сторінка</span>
               </button>
-              <button
-                onClick={() => setIsAuthScreen(true)}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
-              >
-                <span>Курси</span>
-              </button>
+              {token ? (
+                <button onClick={() => setCurrentPage('courses')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <span>Курси</span>
+                </button>
+              ) : (
+                <button onClick={() => setIsAuthScreen(true)} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <span>Курси</span>
+                </button>
+              )}
             </div>
             <div className="flex space-x-4">
               <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
-              <button
-                onClick={() => setIsAuthScreen(true)}
-                className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
-              >
-                <FiUser /> <span>Особистий кабінет</span>
-              </button>
-              <button
-                onClick={() => setIsAuthScreen(true)}
-                className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
-              >
-                <FiLogIn /> <span>Увійти</span>
-              </button>
+              {token ? (
+                <button onClick={() => setCurrentPage('profile')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <FiUser /> <span>Особистий кабінет</span>
+                </button>
+              ) : (
+                <button onClick={() => setIsAuthScreen(true)} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <FiUser /> <span>Особистий кабінет</span>
+                </button>
+              )}
+              {token ? (
+                <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                  <FiLogOut /> <span>Вийти</span>
+                </button>
+              ) : (
+                <button onClick={() => setIsAuthScreen(true)} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                  <FiLogIn /> <span>Увійти</span>
+                </button>
+              )}
             </div>
           </header>
           <main className="text-center flex-1">
@@ -282,7 +243,8 @@ function App() {
             <p>© 2025 Гопка Максим Сергійович. Усі права захищені.</p>
           </footer>
         </div>
-      ) : !token && isAuthScreen ? (
+      )}
+      {isAuthScreen && !token && (
         <div className="w-full max-w-md bg-cardBackground rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-textPrimary mb-6 text-center">Реєстрація / Вхід</h1>
           {error && <p className="text-error mb-4">{error}</p>}
@@ -293,20 +255,21 @@ function App() {
             <button onClick={handleLogin} className="flex-1 bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition">Увійти</button>
           </div>
         </div>
-      ) : isProfileScreen ? (
+      )}
+      {currentPage === 'profile' && token && (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
           <div className="flex justify-between items-center mb-6">
             <div className="flex space-x-4">
-              <button onClick={() => { setIsProfileScreen(false); setIsAuthScreen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+              <button onClick={() => setCurrentPage('home')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                 <FaHome /> <span>Головна сторінка</span>
               </button>
-              <button onClick={() => { setIsProfileScreen(false); setIsAuthScreen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+              <button onClick={() => setCurrentPage('courses')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                 <span>Курси</span>
               </button>
             </div>
             <div className="flex space-x-4">
               <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
-              <button onClick={() => setIsProfileScreen(true)} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
+              <button onClick={() => setCurrentPage('profile')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
               <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
             </div>
           </div>
@@ -320,18 +283,19 @@ function App() {
             <button onClick={handleUpdateProfile} className="w-full bg-primary text-white p-3 rounded-lg hover:bg-indigo-700 transition">Зберегти зміни</button>
           </div>
         </div>
-      ) : (
+      )}
+      {currentPage === 'courses' && token && (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
           <div className="flex justify-between items-center mb-6">
             <div className="flex space-x-4">
-              <button onClick={() => { setIsProfileScreen(false); setIsAuthScreen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+              <button onClick={() => setCurrentPage('home')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
                 <FaHome /> <span>Головна сторінка</span>
               </button>
               <h1 className="header-title text-3xl font-bold">Курси</h1>
             </div>
             <div className="flex space-x-4">
               <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
-              <button onClick={() => setIsProfileScreen(true)} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
+              <button onClick={() => setCurrentPage('profile')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
               <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
             </div>
           </div>
