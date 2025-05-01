@@ -31,7 +31,6 @@ function App() {
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
 
-  // Оновлений lessonData з повним теоретичним матеріалом
   const lessonData = {
     1: {
       title: 'Вступ | Вступ до географії',
@@ -57,7 +56,6 @@ function App() {
 
   const mainPageImageSrc = mainPageImage;
 
-  // Оновлений questions з п’ятьма питаннями для кожного уроку
   const questions = {
     1: [
       { question: 'Що вивчає географія?', options: ['Просторові закономірності', 'Хімічні реакції', 'Історію мистецтва', 'Математичні рівняння'], answer: 'Просторові закономірності' },
@@ -352,21 +350,40 @@ function App() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {lessons.map((lesson) => (
-                <div key={lesson.id} className="lesson-card rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                  <img src={lessonData[lesson.id]?.image} alt={lessonData[lesson.id]?.title} className="w-full h-40 object-cover rounded-lg mb-4" onContextMenu={handleImageProtection} onDragStart={handleImageProtection} />
-                  <div className="flex items-center space-x-2">
+                <div key={lesson.id} className="lesson-card rounded-lg shadow-md p-6 hover:shadow-lg transition relative">
+                  <img
+                    src={lessonData[lesson.id]?.image}
+                    alt={lessonData[lesson.id]?.title}
+                    className="w-full h-40 object-cover rounded-lg mb-4"
+                    onContextMenu={handleImageProtection}
+                    onDragStart={handleImageProtection}
+                  />
+                  <div className="flex items-center space-x-2 mb-4">
                     {lesson.id === 1 && <FaGlobe className="text-primary" />}
                     {lesson.id === 2 && <FaCloudSun className="text-primary" />}
                     {lesson.id === 3 && <FaWater className="text-primary" />}
                     {lesson.id === 4 && <FaUsers className="text-primary" />}
-                    <h2 className="lesson-title text-xl font-semibold mb-2 cursor-pointer" onClick={() => toggleLesson(lesson.id)}>
+                    <h2
+                      className="lesson-title text-xl font-semibold cursor-pointer"
+                      onClick={() => toggleLesson(lesson.id)}
+                    >
                       {lessonData[lesson.id]?.title || lesson.title}
                     </h2>
                   </div>
                   {expandedLesson === lesson.id && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mb-4">
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="absolute z-10 left-0 right-0 top-full bg-cardBackground rounded-lg shadow-lg p-6 mt-2"
+                    >
                       <p className="text-textSecondary mb-4">{lessonData[lesson.id]?.theory}</p>
-                      <button onClick={() => startTest(lesson.id)} className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Пройти тест</button>
+                      <button
+                        onClick={() => startTest(lesson.id)}
+                        className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                      >
+                        Пройти тест
+                      </button>
                     </motion.div>
                   )}
                 </div>
