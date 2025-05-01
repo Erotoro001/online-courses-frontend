@@ -44,7 +44,7 @@ body.dark {
   --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
   --modalQuestionText: #f9fafb; /* Білий текст для питань */
   --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
-  --tableHeaderText: #f9fafb; /* Білий текст для заголовків таблиці */
+  --tableHeaderText: #f9fafba2; /* Білий текст для заголовків таблиці */
 }
 
 body {
