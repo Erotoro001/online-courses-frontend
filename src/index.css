@@ -44,7 +44,7 @@ body.dark {
   --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
   --modalQuestionText: #f9fafb; /* Білий текст для питань */
   --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
-  --tableHeaderText: #1f2937; /* Білий текст для заголовків таблиці */
+  --tableHeaderText: #f9fafb; /* Виправлено: Білий текст для заголовків таблиці */
 }
 
 body {
@@ -55,7 +55,7 @@ body {
   color: var(--textPrimary);
 }
 
-/* Стилі для заголовків (наприклад, "Уроки") */
+/* Стилі для заголовків (наприклад, "Курси") */
 h1.header-title {
   color: var(--headerText);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
@@ -150,18 +150,21 @@ body.dark button.button-gray:hover {
 .lesson-card {
   background-color: var(--cardBackground);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* Додаємо ізоляцію для карток уроків */
-.lesson-card {
-  position: relative; /* Для позиціонування розгорнутого вмісту */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Забезпечуємо, щоб заголовок не переносився */
 .lesson-title {
-  white-space: nowrap; /* Запобігаємо переносу тексту */
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Стилі для розгорнутого вмісту */
+.lesson-card .overflow-auto {
+  overflow-y: auto;
+  max-height: 192px; /* 48 * 4 = 192px */
 }
 
 /* Ефект для зображень */

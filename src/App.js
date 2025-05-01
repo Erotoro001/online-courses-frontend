@@ -350,7 +350,7 @@ function App() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               {lessons.map((lesson) => (
-                <div key={lesson.id} className="lesson-card rounded-lg shadow-md p-6 hover:shadow-lg transition relative">
+                <div key={lesson.id} className="lesson-card rounded-lg shadow-md p-6 hover:shadow-lg transition flex flex-col">
                   <img
                     src={lessonData[lesson.id]?.image}
                     alt={lessonData[lesson.id]?.title}
@@ -370,22 +370,24 @@ function App() {
                       {lessonData[lesson.id]?.title || lesson.title}
                     </h2>
                   </div>
-                  {expandedLesson === lesson.id && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      className="absolute z-10 left-0 right-0 top-full bg-cardBackground rounded-lg shadow-lg p-6 mt-2"
-                    >
-                      <p className="text-textSecondary mb-4">{lessonData[lesson.id]?.theory}</p>
-                      <button
-                        onClick={() => startTest(lesson.id)}
-                        className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                  <AnimatePresence>
+                    {expandedLesson === lesson.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-auto max-h-48 mt-2"
                       >
-                        Пройти тест
-                      </button>
-                    </motion.div>
-                  )}
+                        <p className="text-textSecondary mb-4">{lessonData[lesson.id]?.theory}</p>
+                        <button
+                          onClick={() => startTest(lesson.id)}
+                          className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                        >
+                          Пройти тест
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
             </div>
