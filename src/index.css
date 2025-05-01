@@ -25,6 +25,7 @@ body.light {
   --modalText: #1f2937; /* Темний текст у модальному вікні */
   --modalQuestionText: #111827; /* Ще темніший текст для питань */
   --tableHoverBg: #e0e7ff; /* Світло-синій фон для ховеру таблиці у світлій темі */
+  --tableHeaderText: #1f2937; /* Темний текст для заголовків таблиці */
 }
 
 body.dark {
@@ -43,6 +44,7 @@ body.dark {
   --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
   --modalQuestionText: #f9fafb; /* Білий текст для питань */
   --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
+  --tableHeaderText: #f9fafb; /* Білий текст для заголовків таблиці */
 }
 
 body {
@@ -69,6 +71,12 @@ h2.lesson-title {
 h2.results-header {
   color: var(--resultsHeaderText);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для заголовків таблиці */
+th {
+  color: var(--tableHeaderText);
+  font-weight: 600;
 }
 
 /* Стилі для модального вікна */
