@@ -26,6 +26,7 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [isAuthScreen, setIsAuthScreen] = useState(false);
   const [isProfileScreen, setIsProfileScreen] = useState(false);
+  const [isCoursesScreen, setIsCoursesScreen] = useState(false);
   const [expandedLesson, setExpandedLesson] = useState(null);
   const [theme, setTheme] = useState('light');
 
@@ -116,6 +117,8 @@ function App() {
       localStorage.setItem('token', newToken);
       setError(null);
       setIsAuthScreen(false);
+      setIsCoursesScreen(true);
+      setIsProfileScreen(false);
       alert('Вхід успішний');
     } catch (error) {
       console.error('Помилка входу:', error.response?.data || error.message);
@@ -130,6 +133,7 @@ function App() {
     setResults([]);
     setError(null);
     setIsAuthScreen(false);
+    setIsCoursesScreen(false);
     setIsProfileScreen(false);
     alert('Ви вийшли з облікового запису');
   }, []);
@@ -199,14 +203,14 @@ function App() {
   }, [token, handleLogout, API_URL]);
 
   useEffect(() => {
-    if (token && !isProfileScreen) {
+    if (token && isCoursesScreen && !isProfileScreen && !isAuthScreen) {
       fetchLessons();
       fetchResults();
     }
-    if (token && isProfileScreen) {
+    if (token && isProfileScreen && !isCoursesScreen && !isAuthScreen) {
       fetchUserProfile();
     }
-  }, [token, fetchLessons, fetchResults, fetchUserProfile, isProfileScreen]);
+  }, [token, isCoursesScreen, isProfileScreen, isAuthScreen, fetchLessons, fetchResults, fetchUserProfile]);
 
   const handleUpdateProfile = async () => {
     try {
@@ -291,31 +295,58 @@ function App() {
     return false;
   };
 
+  // Функції для навігації
+  const goToMainPage = () => {
+    setIsAuthScreen(false);
+    setIsCoursesScreen(false);
+    setIsProfileScreen(false);
+  };
+
+  const goToCourses = () => {
+    if (!token) {
+      setIsAuthScreen(true);
+      setIsCoursesScreen(false);
+      setIsProfileScreen(false);
+    } else {
+      setIsAuthScreen(false);
+      setIsCoursesScreen(true);
+      setIsProfileScreen(false);
+    }
+  };
+
+  const goToProfile = () => {
+    if (!token) {
+      setIsAuthScreen(true);
+      setIsCoursesScreen(false);
+      setIsProfileScreen(false);
+    } else {
+      setIsAuthScreen(false);
+      setIsCoursesScreen(false);
+      setIsProfileScreen(true);
+    }
+  };
+
+  const goToAuth = () => {
+    setIsAuthScreen(true);
+    setIsCoursesScreen(false);
+    setIsProfileScreen(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center p-6">
-      {!token && !isAuthScreen ? (
+      {/* Головна сторінка */}
+      {!token && !isAuthScreen && !isCoursesScreen && !isProfileScreen ? (
         <div className="w-full max-w-4xl flex flex-col items-center">
           <header className="w-full flex justify-between items-center mb-6">
             <div className="flex space-x-4">
               <button
-                onClick={() => {
-                  setIsProfileScreen(false);
-                  setIsAuthScreen(false);
-                }}
+                onClick={goToMainPage}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <FaHome /> <span>Головна сторінка</span>
               </button>
               <button
-                onClick={() => {
-                  if (token) {
-                    fetchLessons();
-                    setIsProfileScreen(false);
-                    setIsAuthScreen(false);
-                  } else {
-                    setIsAuthScreen(true);
-                  }
-                }}
+                onClick={goToCourses}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <span>Курси</span>
@@ -329,19 +360,13 @@ function App() {
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
               <button
-                onClick={() => {
-                  if (token) {
-                    setIsProfileScreen(true);
-                  } else {
-                    setIsAuthScreen(true);
-                  }
-                }}
+                onClick={goToProfile}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <FiUser /> <span>Особистий кабінет</span>
               </button>
               <button
-                onClick={() => setIsAuthScreen(true)}
+                onClick={goToAuth}
                 className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
               >
                 <FiLogIn /> <span>Вийти</span>
@@ -386,7 +411,10 @@ function App() {
             </p>
           </footer>
         </div>
-      ) : !token && isAuthScreen ? (
+      ) : null}
+
+      {/* Сторінка авторизації */}
+      {isAuthScreen && !isCoursesScreen && !isProfileScreen ? (
         <div className="w-full max-w-md bg-cardBackground rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold text-textPrimary mb-6 text-center">Реєстрація / Вхід</h1>
           {error && <p className="text-error mb-4">{error}</p>}
@@ -419,21 +447,21 @@ function App() {
             </button>
           </div>
         </div>
-      ) : isProfileScreen ? (
+      ) : null}
+
+      {/* Сторінка профілю */}
+      {token && isProfileScreen && !isAuthScreen && !isCoursesScreen ? (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
           <div className="flex justify-between items-center mb-6">
             <div className="flex space-x-4">
               <button
-                onClick={() => {
-                  setIsProfileScreen(false);
-                  setIsAuthScreen(false);
-                }}
+                onClick={goToMainPage}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <FaHome /> <span>Головна сторінка</span>
               </button>
               <button
-                onClick={() => setIsProfileScreen(false)}
+                onClick={goToCourses}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <span>Курси</span>
@@ -448,7 +476,7 @@ function App() {
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
               <button
-                onClick={() => setIsProfileScreen(true)}
+                onClick={goToProfile}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <FiUser /> <span>Особистий кабінет</span>
@@ -517,15 +545,15 @@ function App() {
             </p>
           </footer>
         </div>
-      ) : (
+      ) : null}
+
+      {/* Сторінка курсів */}
+      {token && isCoursesScreen && !isAuthScreen && !isProfileScreen ? (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
           <div className="flex justify-between items-center mb-6">
             <div className="flex space-x-4">
               <button
-                onClick={() => {
-                  setIsProfileScreen(false);
-                  setIsAuthScreen(false);
-                }}
+                onClick={goToMainPage}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <FaHome /> <span>Головна сторінка</span>
@@ -540,7 +568,7 @@ function App() {
                 {theme === 'light' ? 'Темна тема' : 'Світла тема'}
               </button>
               <button
-                onClick={() => setIsProfileScreen(true)}
+                onClick={goToProfile}
                 className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"
               >
                 <FiUser /> <span>Особистий кабінет</span>
@@ -696,7 +724,7 @@ function App() {
             </p>
           </footer>
         </div>
-      )}
+      ) : null}
 
       <AnimatePresence>
         {isModalOpen && currentLessonId && (
