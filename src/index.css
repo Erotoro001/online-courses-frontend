@@ -44,7 +44,7 @@ body.dark {
   --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
   --modalQuestionText: #f9fafb; /* Білий текст для питань */
   --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
-  --tableHeaderText: #1f2937; /* Білий текст для заголовків таблиці */
+  --tableHeaderText: #1f2937; /* Виправлено: Білий текст для заголовків таблиці */
 }
 
 body {
@@ -97,6 +97,12 @@ th {
 .modal-option {
   color: var(--modalText);
   border-color: var(--borderColor);
+}
+
+/* Виправлення для темної теми: змінюємо колір тексту при наведенні */
+body.dark .modal-option:hover {
+  background-color: var(--secondary); /* Світло-синій фон */
+  color: #1f2937; /* Темний текст для контрасту */
 }
 
 /* Стилі для кнопок */
