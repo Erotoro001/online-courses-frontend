@@ -44,7 +44,7 @@ body.dark {
   --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
   --modalQuestionText: #f9fafb; /* Білий текст для питань */
   --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
-  --tableHeaderText: #f9fafb; /* Виправлено: Білий текст для заголовків таблиці */
+  --tableHeaderText: #f9fafb; /* Білий текст для заголовків таблиці */
 }
 
 body {
@@ -144,6 +144,11 @@ button.button-gray:hover {
 
 body.dark button.button-gray:hover {
   background-color: #6b7280; /* Темніший сірий для ховеру у темній темі */
+}
+
+/* Стилі для кнопки меню на мобільних */
+button svg {
+  color: var(--textPrimary);
 }
 
 /* Стилі для карток уроків */

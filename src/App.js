@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { FiLogOut, FiLogIn, FiUser } from 'react-icons/fi';
+import { FiLogOut, FiLogIn, FiUser, FiMenu, FiX } from 'react-icons/fi';
 import { FaGlobe, FaCloudSun, FaWater, FaUsers, FaCheckCircle, FaTimesCircle, FaHome } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import mainPageImage from './assets/images/main-page.jpg';
@@ -28,6 +28,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [expandedLesson, setExpandedLesson] = useState(null);
   const [theme, setTheme] = useState('light');
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // Новий стан для меню
 
   const API_URL = process.env.REACT_APP_API_URL || 'https://online-courses-backend.onrender.com';
 
@@ -124,6 +125,7 @@ function App() {
     setError(null);
     setIsAuthScreen(false);
     setCurrentPage('home');
+    setIsMenuOpen(false); // Закриваємо меню при виході
   }, []);
 
   const fetchLessons = useCallback(async () => {
@@ -225,6 +227,8 @@ function App() {
 
   const toggleLesson = (lessonId) => setExpandedLesson(expandedLesson === lessonId ? null : lessonId);
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
   const handleImageProtection = (e) => {
     e.preventDefault();
     return false;
@@ -234,44 +238,93 @@ function App() {
     <div className="min-h-screen flex flex-col items-center p-6">
       {currentPage === 'home' && (
         <div className="w-full max-w-4xl flex flex-col items-center">
-          <header className="w-full flex justify-between items-center mb-6">
-            <div className="flex space-x-4">
-              <button onClick={() => setCurrentPage('home')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                <FaHome /> <span>Головна сторінка</span>
+          <header className="w-full mb-6">
+            <div className="flex justify-between items-center">
+              <div className="md:flex md:space-x-4 hidden">
+                <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <FaHome /> <span>Головна сторінка</span>
+                </button>
+                {token ? (
+                  <button onClick={() => { setCurrentPage('courses'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <span>Курси</span>
+                  </button>
+                ) : (
+                  <button onClick={() => { setIsAuthScreen(true); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <span>Курси</span>
+                  </button>
+                )}
+              </div>
+              <div className="md:flex md:space-x-4 hidden">
+                <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  {theme === 'light' ? 'Темна тема' : 'Світла тема'}
+                </button>
+                {token ? (
+                  <button onClick={() => { setCurrentPage('profile'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <FiUser /> <span>Особистий кабінет</span>
+                  </button>
+                ) : (
+                  <button onClick={() => { setIsAuthScreen(true); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <FiUser /> <span>Особистий кабінет</span>
+                  </button>
+                )}
+                {token ? (
+                  <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                    <FiLogOut /> <span>Вийти</span>
+                  </button>
+                ) : (
+                  <button onClick={() => { setIsAuthScreen(true); setIsMenuOpen(false); }} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    <FiLogIn /> <span>Увійти</span>
+                  </button>
+                )}
+              </div>
+              <button onClick={toggleMenu} className="md:hidden text-2xl">
+                {isMenuOpen ? <FiX /> : <FiMenu />}
               </button>
-              {token ? (
-                <button onClick={() => setCurrentPage('courses')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                  <span>Курси</span>
-                </button>
-              ) : (
-                <button onClick={() => setIsAuthScreen(true)} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                  <span>Курси</span>
-                </button>
-              )}
             </div>
-            <div className="flex space-x-4">
-              <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                {theme === 'light' ? 'Темна тема' : 'Світла тема'}
-              </button>
-              {token ? (
-                <button onClick={() => setCurrentPage('profile')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                  <FiUser /> <span>Особистий кабінет</span>
-                </button>
-              ) : (
-                <button onClick={() => setIsAuthScreen(true)} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                  <FiUser /> <span>Особистий кабінет</span>
-                </button>
+            <AnimatePresence>
+              {isMenuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="md:hidden flex flex-col space-y-2 mt-2"
+                >
+                  <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <FaHome /> <span>Головна сторінка</span>
+                  </button>
+                  {token ? (
+                    <button onClick={() => { setCurrentPage('courses'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                      <span>Курси</span>
+                    </button>
+                  ) : (
+                    <button onClick={() => { setIsAuthScreen(true); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                      <span>Курси</span>
+                    </button>
+                  )}
+                  <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    {theme === 'light' ? 'Темна тема' : 'Світла тема'}
+                  </button>
+                  {token ? (
+                    <button onClick={() => { setCurrentPage('profile'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                      <FiUser /> <span>Особистий кабінет</span>
+                    </button>
+                  ) : (
+                    <button onClick={() => { setIsAuthScreen(true); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                      <FiUser /> <span>Особистий кабінет</span>
+                    </button>
+                  )}
+                  {token ? (
+                    <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                      <FiLogOut /> <span>Вийти</span>
+                    </button>
+                  ) : (
+                    <button onClick={() => { setIsAuthScreen(true); setIsMenuOpen(false); }} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                      <FiLogIn /> <span>Увійти</span>
+                    </button>
+                  )}
+                </motion.div>
               )}
-              {token ? (
-                <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
-                  <FiLogOut /> <span>Вийти</span>
-                </button>
-              ) : (
-                <button onClick={() => setIsAuthScreen(true)} className="flex items-center space-x-2 bg-primary text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                  <FiLogIn /> <span>Увійти</span>
-                </button>
-              )}
-            </div>
+            </AnimatePresence>
           </header>
           <main className="text-center flex-1">
             <img src={mainPageImageSrc} alt="GeoLearn Main Page" className="w-full max-w-md mx-auto mb-6 rounded-lg shadow-md" onContextMenu={handleImageProtection} onDragStart={handleImageProtection} />
@@ -298,21 +351,46 @@ function App() {
       )}
       {currentPage === 'profile' && token && (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex space-x-4">
-              <button onClick={() => setCurrentPage('home')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                <FaHome /> <span>Головна сторінка</span>
-              </button>
-              <button onClick={() => setCurrentPage('courses')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                <span>Курси</span>
+          <header className="w-full mb-6">
+            <div className="flex justify-between items-center">
+              <div className="md:flex md:space-x-4 hidden">
+                <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <FaHome /> <span>Головна сторінка</span>
+                </button>
+                <button onClick={() => { setCurrentPage('courses'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <span>Курси</span>
+                </button>
+              </div>
+              <div className="md:flex md:space-x-4 hidden">
+                <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
+                <button onClick={() => { setCurrentPage('profile'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
+                <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
+              </div>
+              <button onClick={toggleMenu} className="md:hidden text-2xl">
+                {isMenuOpen ? <FiX /> : <FiMenu />}
               </button>
             </div>
-            <div className="flex space-x-4">
-              <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
-              <button onClick={() => setCurrentPage('profile')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
-              <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
-            </div>
-          </div>
+            <AnimatePresence>
+              {isMenuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="md:hidden flex flex-col space-y-2 mt-2"
+                >
+                  <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <FaHome /> <span>Головна сторінка</span>
+                  </button>
+                  <button onClick={() => { setCurrentPage('courses'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <span>Курси</span>
+                  </button>
+                  <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
+                  <button onClick={() => { setCurrentPage('profile'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
+                  <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </header>
           {error && <p className="text-error mb-4">{error}</p>}
           <div className="w-full max-w-md bg-cardBackground rounded-lg shadow-lg p-6 mx-auto">
             <h2 className="text-2xl font-bold text-textPrimary mb-6 text-center">Редагувати профіль</h2>
@@ -326,19 +404,42 @@ function App() {
       )}
       {currentPage === 'courses' && token && (
         <div className="w-full max-w-4xl flex flex-col min-h-screen">
-          <div className="flex justify-between items-center mb-6">
-            <div className="flex space-x-4">
-              <button onClick={() => setCurrentPage('home')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
-                <FaHome /> <span>Головна сторінка</span>
+          <header className="w-full mb-6">
+            <div className="flex justify-between items-center">
+              <div className="md:flex md:space-x-4 hidden">
+                <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                  <FaHome /> <span>Головна сторінка</span>
+                </button>
+                <h1 className="header-title text-3xl font-bold">Курси</h1>
+              </div>
+              <div className="md:flex md:space-x-4 hidden">
+                <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
+                <button onClick={() => { setCurrentPage('profile'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
+                <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
+              </div>
+              <button onClick={toggleMenu} className="md:hidden text-2xl">
+                {isMenuOpen ? <FiX /> : <FiMenu />}
               </button>
-              <h1 className="header-title text-3xl font-bold">Курси</h1>
             </div>
-            <div className="flex space-x-4">
-              <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
-              <button onClick={() => setCurrentPage('profile')} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
-              <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
-            </div>
-          </div>
+            <AnimatePresence>
+              {isMenuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="md:hidden flex flex-col space-y-2 mt-2"
+                >
+                  <button onClick={() => { setCurrentPage('home'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+                    <FaHome /> <span>Головна сторінка</span>
+                  </button>
+                  <h1 className="header-title text-3xl font-bold px-4">Курси</h1>
+                  <button onClick={toggleTheme} className="button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition">{theme === 'light' ? 'Темна тема' : 'Світла тема'}</button>
+                  <button onClick={() => { setCurrentPage('profile'); setIsMenuOpen(false); }} className="flex items-center space-x-2 button-gray px-4 py-2 rounded-lg hover:bg-gray-300 transition"><FiUser /> <span>Особистий кабінет</span></button>
+                  <button onClick={handleLogout} className="flex items-center space-x-2 bg-error text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"><FiLogOut /> <span>Вийти</span></button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </header>
           {error && <p className="text-error mb-4">{error}</p>}
           {loading ? (
             <div className="flex justify-center items-center">
