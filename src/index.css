@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #4f46e5; /* Індиго для кнопок і акцентів */
+  --secondary: #e0e7ff; /* Світло-синій для ховерів */
+  --error: #ef4444; /* Червоний для помилок */
+  --success: #10b981; /* Зелений для успішних повідомлень */
+}
+
+body.light {
+  --background: #f9fafb;
+  --cardBackground: #ffffff;
+  --textPrimary: #1f2937;
+  --textSecondary: #6b7280;
+  --buttonBg: #e5e7eb; /* Сірий фон для кнопок у світлій темі */
+  --buttonText: #1f2937; /* Темний текст для кнопок */
+  --borderColor: #d1d5db; /* Світло-сірий для меж */
+  --inputBg: #ffffff; /* Фон для інпутів */
+  --headerText: #1f2937; /* Темний текст для заголовків у світлій темі */
+  --lessonTitle: #1f2937; /* Темний текст для назв уроків */
+  --resultsHeaderText: #1f2937; /* Темний текст для заголовка "Ваші результати" */
+  --modalBg: #ffffff; /* Білий фон для модального вікна */
+  --modalText: #1f2937; /* Темний текст у модальному вікні */
+  --modalQuestionText: #111827; /* Ще темніший текст для питань */
+  --tableHoverBg: #e0e7ff; /* Світло-синій фон для ховеру таблиці у світлій темі */
+  --tableHeaderText: #1f2937; /* Темний текст для заголовків таблиці */
+}
+
+body.dark {
+  --background: #1f2937;
+  --cardBackground: #2d3748; /* Темніший фон для карток у темній темі */
+  --textPrimary: #e5e7eb; /* Світліший текст для кращої видимості */
+  --textSecondary: #9ca3af;
+  --buttonBg: #4b5563; /* Темно-сірий фон для кнопок у темній темі */
+  --buttonText: #f9fafb; /* Світлий текст для кнопок */
+  --borderColor: #4b5563; /* Темно-сірий для меж */
+  --inputBg: #4b5563; /* Темний фон для інпутів */
+  --headerText: #ffffff; /* Білий текст для заголовків у темній темі */
+  --lessonTitle: #d1d5db; /* Світло-сірий текст для назв уроків */
+  --resultsHeaderText: #f9fafb; /* Білий текст для заголовка "Ваші результати" */
+  --modalBg: #2d3748; /* Темний фон для модального вікна */
+  --modalText: #e5e7eb; /* Світлий текст у модальному вікні */
+  --modalQuestionText: #f9fafb; /* Білий текст для питань */
+  --tableHoverBg: #4b5563; /* Темно-сірий фон для ховеру таблиці у темній темі */
+  --tableHeaderText: #1f2937; /* Білий текст для заголовків таблиці */
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+  color: var(--textPrimary);
+}
+
+/* Стилі для заголовків (наприклад, "Курси") */
+h1.header-title {
+  color: var(--headerText);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для назв уроків */
+h2.lesson-title {
+  color: var(--lessonTitle);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для заголовка "Ваші результати" */
+h2.results-header {
+  color: var(--resultsHeaderText);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Легка тінь для кращої видимості */
+}
+
+/* Стилі для заголовків таблиці */
+th {
+  color: var(--tableHeaderText);
+  font-weight: 600;
+}
+
+/* Стилі для модального вікна */
+.modal-content {
+  background-color: var(--modalBg);
+}
+
+.modal-text {
+  color: var(--modalText);
+}
+
+.modal-question {
+  color: var(--modalQuestionText);
+  font-weight: 600; /* Жирніший текст для питань */
+}
+
+/* Стилі для кнопок у модальному вікні */
+.modal-option {
+  color: var(--modalText);
+  border-color: var(--borderColor);
+}
+
+/* Виправлення для темної теми: змінюємо колір тексту при наведенні */
+body.dark .modal-option:hover {
+  background-color: var(--secondary); /* Світло-синій фон */
+  color: #1f2937; /* Темний текст для контрасту */
+}
+
+/* Стилі для кнопок */
+button {
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button.bg-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+button.bg-primary:hover {
+  background-color: #4338ca;
+}
+
+button.bg-error {
+  background-color: var(--error);
+  color: #ffffff;
+}
+
+button.bg-error:hover {
+  background-color: #dc2626;
+}
+
+/* Стилі для кнопок із сірим фоном (наприклад, "Дізнатися більше", "Темна/Світла тема") */
+button.button-gray {
+  background-color: var(--buttonBg);
+  color: var(--buttonText);
+}
+
+button.button-gray:hover {
+  background-color: #d1d5db; /* Світліший сірий для ховеру у світлій темі */
+}
+
+body.dark button.button-gray:hover {
+  background-color: #6b7280; /* Темніший сірий для ховеру у темній темі */
+}
+
+/* Стилі для кнопки меню на мобільних */
+button svg {
+  color: var(--textPrimary);
+}
+
+/* Стилі для карток уроків */
+.lesson-card {
+  background-color: var(--cardBackground);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Забезпечуємо, щоб заголовок не переносився */
+.lesson-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Стилі для розгорнутого вмісту */
+.lesson-card .overflow-auto {
+  overflow-y: auto;
+  max-height: 192px; /* 48 * 4 = 192px */
+}
+
+/* Ефект для зображень */
+.lesson-image, .main-page-image {
+  transition: transform 0.3s ease;
+  user-select: none; /* Заборона виділення зображень */
+  -webkit-user-drag: none; /* Заборона перетягування у WebKit-браузерах */
+  -moz-user-select: none; /* Заборона виділення у Firefox */
+  -ms-user-select: none; /* Заборона виділення у Edge */
+}
+
+.lesson-image:hover, .main-page-image:hover {
+  transform: scale(1.05);
+}
+
+/* Стилі для таблиці результатів */
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+}
+
+thead tr {
+  background-color: var(--secondary);
+}
+
+tbody tr:hover {
+  background-color: var(--tableHoverBg);
+}
+
+/* Стилі для модального вікна */
+.modal {
+  backdrop-filter: blur(5px);
+}
+
+/* Стилі для інпутів */
+input {
+  background-color: var(--inputBg);
+  color: var(--textPrimary);
+  border-color: var(--borderColor);
+  transition: all 0.3s ease;
+}
+
+input:focus {
+  border-color: var(--primary);
+}
+
+/* Стилі для іконок */
+svg.text-primary {
+  color: var(--primary);
+}
+
+svg.text-success {
+  color: var(--success);
+}
+
+svg.text-error {
+  color: var(--error);
+}
+
+/* Стилі для тексту */
+.text-error {
+  color: var(--error);
+}
+
+.text-success {
+  color: var(--success);
+}
